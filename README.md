@@ -10,8 +10,7 @@ Institution: The University of Texas at Austin
 
 Semester: Fall 2026
 
-## Repository structure — a brief description of what is in each subdirectory
-comp_paleo/
+## Repository structure
 
 ├── README.md              # current file
 

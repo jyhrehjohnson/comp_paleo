@@ -5,7 +5,9 @@ This project consists of a collection of shell scripts from Weeks 1-4. The goal 
 
 ## Course context
 Course Name: Computational Paleobiology
+
 Institution: The University of Texas at Austin
+
 Semester: Fall 2026
 
 ## Repository structure — a brief description of what is in each subdirectory

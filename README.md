@@ -38,12 +38,16 @@ Make a script executable once, then run it from the repository root:
 
 chmod +x part01_OS/week03/[script_name].sh
 
-./part01_OS/week03/[script_name].sh [arguments] #part01 is named as part1 in my files, but I know for you they are under part01
+./part01_OS/week03/[script_name].sh [arguments] 
+
+#part01 is named as part1 in my files, but I know for you they are under part01
 
 
 Example 1: [what it does]
 
-./part01_OS/week0N/[script1].sh [args] #part01 is named as part1 in my files, but I know for you they are under part01
+./part01_OS/week0N/[script1].sh [args] 
+
+#part01 is named as part1 in my files, but I know for you they are under part01
 
 
 Example 2: [what it does]

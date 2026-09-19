@@ -12,19 +12,13 @@ Semester: Fall 2026
 
 ## Repository structure
 
-├── README.md              # current file
-
-├── .gitignore             # excludes data files and OS files
-
+├── README.md              #current file
+├── .gitignore             #excludes data files and OS files
 └── part01_OS/
-
-    ├── week01/            # [File system navigation and basic shell commands]
-
-    ├── week02/            # [Text processing with grep, cut, sort, uniq]
-
-    ├── week03/            # [Data cleaning]
-
-    └── week04/            # [Pipeline scripts]
+    ├── week01/            #File system navigation and basic shell commands
+    ├── week02/            #Text processing with grep, cut, sort, uniq
+    ├── week03/            #Data cleaning
+    └── week04/            #Pipeline scripts
 
 ## Dependencies — what software is needed to run these scripts (bash version, OS, any tools like awk/sed)
 - OS: macOS

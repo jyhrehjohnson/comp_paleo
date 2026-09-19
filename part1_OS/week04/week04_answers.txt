@@ -1,0 +1,685 @@
+Name: Jyhreh Johnson
+Date: 9/15/2026
+Dataset: Origins OTB Fossil Database (otb_fossils_tsv) & EPPE Fossil Database (eppe.fossils.tsv)
+
+## PART 1 - YOUR FIRST SCRIPTS
+
+### 1.1 Script structure and execution
+Questions:
+1. What does #!/usr/bin/env bash do, and why is it preferable to #!/bin/bash?
+  - #!/usr/bin/env bash tells the operating system which interpreter to use to execute the file. #!/bin/bash hardcodes the absolute path to bash. 
+ It is preferable to use #!/bin/bash because it is more portable across systems, #!/bin/bash lives locally.   
+
+2. What does chmod +x do, and what happens if you try to run the script without it?
+  - It sets the executable permission on the file and allows the operating system to run the file directly as a program.
+
+3. What is the difference between running ./hello_researcher.sh and bash hello_researcher.sh?
+  - ./hello_researcher.sh uses the operating system to execute the file directly. bash hello_researcher.sh uses bash and tells it to run the file as a script. 
+
+### 1.2 - Variables
+
+INPUT
+chmod +x hello_researcher.sh
+./hello_researcher.sh
+
+OUTPUT
+Researcher: jyhrehjohnson
+Date: 2026-09-14
+Dataset: otb_fossils.tsv
+Row count:     1243
+
+### 1.3 - Positional arguments - $1, $2, $#
+
+INPUT
+chmod +x dataset_info.sh
+./dataset_info.sh ~/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv
+./dataset_info.sh ~/Documents/UT/comp_paleo/part1_OS/week03/eppe_fossils.tsv
+./dataset_info.sh nonexistent_file.tsv
+
+OUTPUT
+File:    otb_fossils.tsv
+Rows:        1242 (excluding header)
+Columns:       30
+Header fields:
+     1	catalog_number
+     2	organism_id
+     3	preparations
+     4	year
+     5	discovered_by
+     6	continent
+     7	country
+     8	state_province
+     9	region
+    10	subregion
+    11	place
+    12	locality
+    13	earliest_period_or_lowest_system
+    14	latest_period_or_highest_system
+    15	earliest_epoch_or_lowest_series
+    16	latest_epoch_or_highest_series
+    17	earliest_age_or_lowest_stage
+    18	latest_age_or_highest_stage
+    19	formation
+    20	member
+    21	bed
+    22	scientific_name
+    23	identification_qualifier
+    24	date_identified
+    25	verbatim_identification
+    26	verbatim_chronometric_age
+    27	earliest_chronometric_age
+    28	earliest_chronometric_age_reference_system
+    29	latest_chronometric_age
+    30	latest_chronometric_age_reference_system
+=====================================
+=====================================
+File:    eppe_fossils.tsv
+Rows:       13716 (excluding header)
+Columns:       31
+Header fields:
+     1	catalog_number
+     2	institution_code
+     3	collection_code
+     4	occurrence_remarks
+     5	event_date
+     6	basis_of_record
+     7	part_of_organism
+     8	organism_quantity
+     9	organism_quantity_type
+    10	country
+    11	locality
+    12	bed
+    13	maximum_chronometric_age
+    14	maximum_chronometric_age_reference_system
+    15	minimum_chronometric_age
+    16	minimum_chronometric_age_reference_system
+    17	chronometric_age_uncertainty_in_years
+    18	kingdom
+    19	phylum
+    20	subphylum
+    21	class
+    22	order
+    23	family
+    24	tribe
+    25	genus
+    26	specific_epithet
+    27	scientific_name
+    28	identification_qualifier
+    29	taxon_rank
+    30	taxon_remarks
+    31	problem_remarks
+=====================================
+Error: file not found: nonexistent_file.tsv
+
+QUESTIONS
+1. What does $0 contain?
+  - $0 contains the path the script was used with
+
+2. What does $# contain?
+  - $# contains the number of positional arguments that were passed to the script
+
+3. What does exit 1 do, and why does the number matter?
+  - exit 1 terminates the script immediately.
+
+4. Paste the output of running the script on otb_fossils.tsv. 
+File:    otb_fossils.tsv
+Rows:        1242 (excluding header)
+Columns:       30
+Header fields:
+     1	catalog_number
+     2	organism_id
+     3	preparations
+     4	year
+     5	discovered_by
+     6	continent
+     7	country
+     8	state_province
+     9	region
+    10	subregion
+    11	place
+    12	locality
+    13	earliest_period_or_lowest_system
+    14	latest_period_or_highest_system
+    15	earliest_epoch_or_lowest_series
+    16	latest_epoch_or_highest_series
+    17	earliest_age_or_lowest_stage
+    18	latest_age_or_highest_stage
+    19	formation
+    20	member
+    21	bed
+    22	scientific_name
+    23	identification_qualifier
+    24	date_identified
+    25	verbatim_identification
+    26	verbatim_chronometric_age
+    27	earliest_chronometric_age
+    28	earliest_chronometric_age_reference_system
+    29	latest_chronometric_age
+    30	latest_chronometric_age_reference_system
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+## PART 2 - CONDITIONALS
+
+INPUT
+chmod +x validate_tsv.sh
+./validate_tsv.sh ~/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv 30
+./validate_tsv.sh ~/Documents/UT/comp_paleo/part1_OS/week03/eppe_fossils.tsv 31
+
+OUTPUT
+Validating: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv
+Expected columns: 30
+---
+PASS: header has 30 columns
+INFO: 1242 data rows (plus 1 header)
+PASS: all rows have 30 columns
+---
+RESULT: PASSED (0 errors)
+Validating: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/eppe_fossils.tsv
+Expected columns: 31
+---
+PASS: header has 31 columns
+INFO: 13716 data rows (plus 1 header)
+PASS: all rows have 31 columns
+---
+RESULT: PASSED (0 errors)
+
+
+### 2.3 Script: validate a TSV file
+QUESTIONS:
+1. What does $((ERRORS + 1)) do? What kind of expression is this?
+  - $((ERRORS +1)) evaluates the numeric value of errors plus one
+
+2. Why does the script use exit 0 for success and exit 1 for failure?
+  - It follows the universal Unix convention. It lets the script be used programmatically.
+
+3. Run the script on otb_fossils.tsv with the wrong expected column count (e.g. ./validate_tsv.sh otb_fossils.tsv 5). What output do you get? Paste it into your answers file.
+
+Validating: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv
+Expected columns: 5
+---
+FAIL: header has 30 columns (expected 5)
+INFO: 1242 data rows (plus 1 header)
+FAIL: 1244 row(s) have wrong column count
+      First 5 offending line numbers:
+  File: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv | Line 1 has 30 columns
+  File: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv | Line 2 has 30 columns
+  File: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv | Line 3 has 30 columns
+  File: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv | Line 4 has 30 columns
+  File: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv | Line 5 has 30 columns
+---
+RESULT: FAILED (2 errors)
+
+4. Modify the script to also print the filename of the first row with a wrong column count (not just the line number). Paste your modified section of the script.
+
+BAD_ROWS=$(awk -F'\t' -v cols="$EXPECTED_COLS" 'NF != cols {print NR}' "$FILEPATH" | wc -l | tr -d ' ')
+if [ "$BAD_ROWS" -eq 0 ]; then
+    echo "PASS: all rows have $EXPECTED_COLS columns"
+else
+    echo "FAIL: $BAD_ROWS row(s) have wrong column count"
+    echo "      First 5 offending line numbers:"
+    awk -F'\t' -v cols="$EXPECTED_COLS" 
+	'NF != cols {print "  File:", FILENAME, "| Line", NR, "has", NF, "columns"}' \
+        "$FILEPATH" | head -5
+    ERRORS=$((ERRORS + 1))
+fi
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+## PART 3 - LOOPS
+
+### 3.1 for loop: process a list of values
+
+INPUT
+chmod +x formation_counts.sh
+./formation_counts.sh ~/Documents/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv
+
+OUTPUT
+Specimen counts by formation
+Dataset: otb_fossils.tsv
+================================
+Koobi Fora            591
+Shungura              258
+Nachukui              182
+Nawata                2
+Kanapoi               188
+Usno                  22
+================================
+TOTAL                 1242
+
+QUESTION:
+The formation list in the script is hardcoded. What would be better, and why?
+ - A better approach would be to derive the list directly from the data itself, so the script can adapt to the data directly. 
+
+
+### 3.2 for loop: process files in a directory
+QUESTIONS:
+
+1. What does 2>/dev/null do in the ls command, and why is it needed?
+  - 2>/dev/null redirects stderr to /dev/null and forces the terminal to hide error messages. 
+
+2. What happens if you run the script on a directory that contains no TSV files?
+  - The tsv count would be 0.
+
+3. Paste the output when you run it on your week03 directory.
+
+INPUT 
+chmod +x batch_inspect.sh
+./batch_inspect.sh ~/Documents/UT/comp_paleo/part1_OS/week03/
+
+OUTPUT
+Found 4 TSV file(s) in: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/
+
+Filename                                 Rows   Columns
+--------                                 ----   -------
+eppe_fossils.tsv                        13716        31
+otb_fossils.tsv                          1242        30
+specimens_summary_short.tsv              1243         3
+specimens_summary.tsv                    1243         3
+
+
+### 3.3 while loop: read a file line by line
+
+INPUT
+chmod +x check_catalog_numbers.sh
+./check_catalog_numbers.sh ~/Documents/UT/comp_paleo/part1_OS/week03/eppe_fossils.tsv "EP "
+./check_catalog_numbers.sh ~/ocuments/UT/comp_paleo/part1_OS/week03/otb_fossils.tsv "KNM"
+
+OUTPUT
+Checking catalog numbers in: eppe_fossils.tsv
+Expected prefix: 'EP '
+
+
+Check complete. Problems logged to: bad_catalog_numbers.log
+Checking catalog numbers in: otb_fossils.tsv
+Expected prefix: 'KNM'
+
+Line 2: unexpected catalog number: 'B 7-39a'
+Line 3: unexpected catalog number: 'B 7-39b'
+Line 4: unexpected catalog number: 'B 7-39c'
+Line 5: unexpected catalog number: 'B 8-14a'
+Line 6: unexpected catalog number: 'B 8-14b'
+Line 7: unexpected catalog number: 'B 8-20p'
+Line 8: unexpected catalog number: 'B 8-23a'
+Line 9: unexpected catalog number: 'B 8-23b'
+Line 10: unexpected catalog number: 'B 8-27'
+Line 11: unexpected catalog number: 'B 8-28m'
+Line 12: unexpected catalog number: 'B 8-4q'
+Line 13: unexpected catalog number: 'F 18-3'
+Line 14: unexpected catalog number: 'F 203-1'
+Line 15: unexpected catalog number: 'F 22-1a'
+Line 16: unexpected catalog number: 'F 22-1b'
+Line 17: unexpected catalog number: 'F 22-2'
+Line 18: unexpected catalog number: 'F 511-16'
+Line 19: unexpected catalog number: 'FJ-1 Hd1'
+Line 20: unexpected catalog number: 'FJ-1 Hd2'
+Line 21: unexpected catalog number: 'FJ-1 Hd3'
+Line 22: unexpected catalog number: 'FJ-1 Hd4'
+Line 23: unexpected catalog number: 'FJ-4-SB-1a'
+Line 24: unexpected catalog number: 'FJ-4-SB-1b'
+Line 25: unexpected catalog number: 'FJ-4-SB-1c'
+Line 26: unexpected catalog number: 'FJ-4-SB-1d'
+Line 27: unexpected catalog number: 'FJ-4-SB-1e'
+Line 28: unexpected catalog number: 'FJ-4-SB-1f'
+Line 29: unexpected catalog number: 'FJ-4-SB-2'
+Line 982: unexpected catalog number: 'L 1-1399'
+Line 983: unexpected catalog number: 'L 1-292'
+Line 984: unexpected catalog number: 'L 1-294'
+Line 985: unexpected catalog number: 'L 1-398'
+Line 986: unexpected catalog number: 'L 1-468'
+Line 987: unexpected catalog number: 'L 1-611'
+Line 988: unexpected catalog number: 'L 1-667'
+Line 989: unexpected catalog number: 'L 1-768'
+Line 990: unexpected catalog number: 'L 10-21'
+Line 991: unexpected catalog number: 'L 105-7'
+Line 992: unexpected catalog number: 'L 136-9'
+Line 993: unexpected catalog number: 'L 144-23'
+Line 994: unexpected catalog number: 'L 144-24'
+Line 995: unexpected catalog number: 'L 157-35'
+Line 996: unexpected catalog number: 'L 183-11'
+Line 997: unexpected catalog number: 'L 2-79'
+Line 998: unexpected catalog number: 'L 2-89'
+Line 999: unexpected catalog number: 'L 209-17'
+Line 1000: unexpected catalog number: 'L 209-18'
+Line 1001: unexpected catalog number: 'L 209-30'
+Line 1002: unexpected catalog number: 'L 238-35'
+Line 1003: unexpected catalog number: 'L 26-1g'
+Line 1004: unexpected catalog number: 'L 26-59'
+Line 1005: unexpected catalog number: 'L 28-125'
+Line 1006: unexpected catalog number: 'L 28-126'
+Line 1007: unexpected catalog number: 'L 28-28x'
+Line 1008: unexpected catalog number: 'L 28-30'
+Line 1009: unexpected catalog number: 'L 28-31'
+Line 1010: unexpected catalog number: 'L 28-58'
+Line 1011: unexpected catalog number: 'L 296-1'
+Line 1012: unexpected catalog number: 'L 327-16'
+Line 1013: unexpected catalog number: 'L 338/X-32'
+Line 1014: unexpected catalog number: 'L 338/X-33'
+Line 1015: unexpected catalog number: 'L 338/X-34'
+Line 1016: unexpected catalog number: 'L 338/X-35'
+Line 1017: unexpected catalog number: 'L 338/X-39'
+Line 1018: unexpected catalog number: 'L 338/X-40'
+Line 1019: unexpected catalog number: 'L 338/X-41'
+Line 1020: unexpected catalog number: 'L 338/X-42'
+Line 1021: unexpected catalog number: 'L 338/Y-6'
+Line 1022: unexpected catalog number: 'L 338/Y-89'
+Line 1023: unexpected catalog number: 'L 338/Y-9'
+Line 1024: unexpected catalog number: 'L 345-11'
+Line 1025: unexpected catalog number: 'L 362-14'
+Line 1026: unexpected catalog number: 'L 398-120'
+Line 1027: unexpected catalog number: 'L 398-1215'
+Line 1028: unexpected catalog number: 'L 398-1223'
+Line 1029: unexpected catalog number: 'L 398-14'
+Line 1030: unexpected catalog number: 'L 398-1699'
+Line 1031: unexpected catalog number: 'L 398-2230'
+Line 1032: unexpected catalog number: 'L 398-2282'
+Line 1033: unexpected catalog number: 'L 398-2608'
+Line 1034: unexpected catalog number: 'L 398-2626'
+Line 1035: unexpected catalog number: 'L 398-2627'
+Line 1036: unexpected catalog number: 'L 398-264'
+Line 1037: unexpected catalog number: 'L 398-266'
+Line 1038: unexpected catalog number: 'L 398-573'
+Line 1039: unexpected catalog number: 'L 398-630'
+Line 1040: unexpected catalog number: 'L 398-847'
+Line 1041: unexpected catalog number: 'L 40-15c'
+Line 1042: unexpected catalog number: 'L 40-19'
+Line 1043: unexpected catalog number: 'L 420-15'
+Line 1044: unexpected catalog number: 'L 427-7'
+Line 1045: unexpected catalog number: 'L 45-2'
+Line 1046: unexpected catalog number: 'L 465-111'
+Line 1047: unexpected catalog number: 'L 465-112'
+Line 1048: unexpected catalog number: 'L 465-113'
+Line 1049: unexpected catalog number: 'L 50-2'
+Line 1050: unexpected catalog number: 'L 51-1'
+Line 1051: unexpected catalog number: 'L 51-2'
+Line 1052: unexpected catalog number: 'L 51-3'
+Line 1053: unexpected catalog number: 'L 51-4'
+Line 1054: unexpected catalog number: 'L 51-5'
+Line 1055: unexpected catalog number: 'L 51-6'
+Line 1056: unexpected catalog number: 'L 51-7'
+Line 1057: unexpected catalog number: 'L 51-79'
+Line 1058: unexpected catalog number: 'L 51-80'
+Line 1059: unexpected catalog number: 'L 54/A-20'
+Line 1060: unexpected catalog number: 'L 55-33'
+Line 1061: unexpected catalog number: 'L 55-34'
+Line 1062: unexpected catalog number: 'L 55-57'
+Line 1063: unexpected catalog number: 'L 561-1'
+Line 1064: unexpected catalog number: 'L 571-2'
+Line 1065: unexpected catalog number: 'L 576-18'
+Line 1066: unexpected catalog number: 'L 576-27'
+Line 1067: unexpected catalog number: 'L 62-17'
+Line 1068: unexpected catalog number: 'L 626-45'
+Line 1069: unexpected catalog number: 'L 628-1'
+Line 1070: unexpected catalog number: 'L 628-10'
+Line 1071: unexpected catalog number: 'L 628-2'
+Line 1072: unexpected catalog number: 'L 628-224'
+Line 1073: unexpected catalog number: 'L 628-3'
+Line 1074: unexpected catalog number: 'L 628-4'
+Line 1075: unexpected catalog number: 'L 628-5'
+Line 1076: unexpected catalog number: 'L 628-6'
+Line 1077: unexpected catalog number: 'L 628-7'
+Line 1078: unexpected catalog number: 'L 628-8'
+Line 1079: unexpected catalog number: 'L 628-9'
+Line 1080: unexpected catalog number: 'L 64-2'
+Line 1081: unexpected catalog number: 'L 64-23'
+Line 1082: unexpected catalog number: 'L 7-279'
+Line 1083: unexpected catalog number: 'L 7/A-125'
+Line 1084: unexpected catalog number: 'L 704-2'
+Line 1085: unexpected catalog number: 'L 726-11'
+Line 1086: unexpected catalog number: 'L 74/A-21'
+Line 1087: unexpected catalog number: 'L 754-8'
+Line 1088: unexpected catalog number: 'L 795-1'
+Line 1089: unexpected catalog number: 'L 797-1'
+Line 1090: unexpected catalog number: 'L 824-5'
+Line 1091: unexpected catalog number: 'L 849-1'
+Line 1092: unexpected catalog number: 'L 852-15'
+Line 1093: unexpected catalog number: 'L 860-2'
+Line 1094: unexpected catalog number: 'L 880-1a'
+Line 1095: unexpected catalog number: 'L 880-1b'
+Line 1096: unexpected catalog number: 'L 880-1c'
+Line 1097: unexpected catalog number: 'L 880-1d'
+Line 1098: unexpected catalog number: 'L 880-2a'
+Line 1099: unexpected catalog number: 'L 880-2b'
+Line 1100: unexpected catalog number: 'L 894-1'
+Line 1101: unexpected catalog number: 'L 9-11'
+Line 1102: unexpected catalog number: 'L 9-12'
+Line 1103: unexpected catalog number: 'L 9-92'
+Line 1104: unexpected catalog number: 'OMO 119-1973-2718'
+Line 1105: unexpected catalog number: 'OMO 123/N-1973-5495'
+Line 1106: unexpected catalog number: 'OMO 136-1972-1'
+Line 1107: unexpected catalog number: 'OMO 136-1972-2'
+Line 1108: unexpected catalog number: 'OMO 136-1972-3'
+Line 1109: unexpected catalog number: 'OMO 141-1972-1'
+Line 1110: unexpected catalog number: 'OMO 141-1972-112'
+Line 1111: unexpected catalog number: 'OMO 141-1972-115'
+Line 1112: unexpected catalog number: 'OMO 141-1972-117'
+Line 1113: unexpected catalog number: 'OMO 141-1972-118'
+Line 1114: unexpected catalog number: 'OMO 141-1972-123'
+Line 1115: unexpected catalog number: 'OMO 141-1972-129'
+Line 1116: unexpected catalog number: 'OMO 141-1972-167'
+Line 1117: unexpected catalog number: 'OMO 141-1972-168'
+Line 1118: unexpected catalog number: 'OMO 141-1972-177'
+Line 1119: unexpected catalog number: 'OMO 141-1972-180'
+Line 1120: unexpected catalog number: 'OMO 141-1972-181'
+Line 1121: unexpected catalog number: 'OMO 141-1972-182'
+Line 1122: unexpected catalog number: 'OMO 141-1972-2'
+Line 1123: unexpected catalog number: 'OMO 141-1972-23'
+Line 1124: unexpected catalog number: 'OMO 141-1972-4'
+Line 1125: unexpected catalog number: 'OMO 141-1972-69'
+Line 1126: unexpected catalog number: 'OMO 166-1973-781'
+Line 1127: unexpected catalog number: 'OMO 177-1973-4525'
+Line 1128: unexpected catalog number: 'OMO 18-1967-18'
+Line 1129: unexpected catalog number: 'OMO 18-1968-1181'
+Line 1130: unexpected catalog number: 'OMO 18-1968-31'
+Line 1131: unexpected catalog number: 'OMO 18-1968-32'
+Line 1132: unexpected catalog number: 'OMO 18-1968-33'
+Line 1133: unexpected catalog number: 'OMO 18-1968-34'
+Line 1134: unexpected catalog number: 'OMO 18-1968-35'
+Line 1135: unexpected catalog number: 'OMO 18-1968-36'
+Line 1136: unexpected catalog number: 'OMO 18-1968-37'
+Line 1137: unexpected catalog number: 'OMO 18-1968-38'
+Line 1138: unexpected catalog number: 'OMO 18-1968-39'
+Line 1139: unexpected catalog number: 'OMO 18-1968-40'
+Line 1140: unexpected catalog number: 'OMO 18-1970-1799'
+Line 1141: unexpected catalog number: 'OMO 18-1970-1848'
+Line 1142: unexpected catalog number: 'OMO 18/inf-10022'
+Line 1143: unexpected catalog number: 'OMO 195-1973-1630'
+Line 1144: unexpected catalog number: 'OMO 20/1-1973-1886'
+Line 1145: unexpected catalog number: 'OMO 20/4-1970-272'
+Line 1146: unexpected catalog number: 'OMO 212-1973-1950'
+Line 1147: unexpected catalog number: 'OMO 222-1973-2744'
+Line 1148: unexpected catalog number: 'OMO 224-10005'
+Line 1149: unexpected catalog number: 'OMO 263-1973-5479'
+Line 1150: unexpected catalog number: 'OMO 28-1967-19'
+Line 1151: unexpected catalog number: 'OMO 28-1973-4540'
+Line 1152: unexpected catalog number: 'OMO 28/S-1968-30'
+Line 1153: unexpected catalog number: 'OMO 29/1-1968-43'
+Line 1154: unexpected catalog number: 'OMO 323-10003'
+Line 1155: unexpected catalog number: 'OMO 323-10069'
+Line 1156: unexpected catalog number: 'OMO 323-1976-2117'
+Line 1157: unexpected catalog number: 'OMO 323-1976-896a'
+Line 1158: unexpected catalog number: 'OMO 323-1976-896b'
+Line 1159: unexpected catalog number: 'OMO 323-1976-896c'
+Line 1160: unexpected catalog number: 'OMO 323-1976-896d'
+Line 1161: unexpected catalog number: 'OMO 323-1976-896e'
+Line 1162: unexpected catalog number: 'OMO 323-1976-896f'
+Line 1163: unexpected catalog number: 'OMO 323-1976-896g'
+Line 1164: unexpected catalog number: 'OMO 323-1976-896h'
+Line 1165: unexpected catalog number: 'OMO 323-1976-896i'
+Line 1166: unexpected catalog number: 'OMO 323-1976-897'
+Line 1167: unexpected catalog number: 'OMO 323-1976-898'
+Line 1168: unexpected catalog number: 'OMO 329-10015'
+Line 1169: unexpected catalog number: 'OMO 33-1969-10'
+Line 1170: unexpected catalog number: 'OMO 33-1969-9'
+Line 1171: unexpected catalog number: 'OMO 33-1970-62'
+Line 1172: unexpected catalog number: 'OMO 33-1970-63'
+Line 1173: unexpected catalog number: 'OMO 33-1970-64'
+Line 1174: unexpected catalog number: 'OMO 33-1970-65'
+Line 1175: unexpected catalog number: 'OMO 33-1971-506'
+Line 1176: unexpected catalog number: 'OMO 33-1971-507'
+Line 1177: unexpected catalog number: 'OMO 33-1971-508'
+Line 1178: unexpected catalog number: 'OMO 33-1971-509'
+Line 1179: unexpected catalog number: 'OMO 33-1971-740'
+Line 1180: unexpected catalog number: 'OMO 33-1972-31'
+Line 1181: unexpected catalog number: 'OMO 33-1973-3282'
+Line 1182: unexpected catalog number: 'OMO 33-1973-3325'
+Line 1183: unexpected catalog number: 'OMO 33-1973-5496'
+Line 1184: unexpected catalog number: 'OMO 33-1973-5497'
+Line 1185: unexpected catalog number: 'OMO 33-1974-3721'
+Line 1186: unexpected catalog number: 'OMO 33-1974-4000'
+Line 1187: unexpected catalog number: 'OMO 33-1974-6172'
+Line 1188: unexpected catalog number: 'OMO 33-1974-896'
+Line 1189: unexpected catalog number: 'OMO 33/E-1974-3495'
+Line 1190: unexpected catalog number: 'OMO 333-10003'
+Line 1191: unexpected catalog number: 'OMO 35-1973-4022'
+Line 1192: unexpected catalog number: 'OMO 35-1973-4023'
+Line 1193: unexpected catalog number: 'OMO 35-1973-4024'
+Line 1194: unexpected catalog number: 'OMO 44-1970-1410'
+Line 1195: unexpected catalog number: 'OMO 44-1970-2466'
+Line 1196: unexpected catalog number: 'OMO 47-1968-45'
+Line 1197: unexpected catalog number: 'OMO 47-1968-46'
+Line 1198: unexpected catalog number: 'OMO 47-1968-47'
+Line 1199: unexpected catalog number: 'OMO 47-1969-20'
+Line 1200: unexpected catalog number: 'OMO 47-1973-1500'
+Line 1201: unexpected catalog number: 'OMO 57/4-1968-41'
+Line 1202: unexpected catalog number: 'OMO 57/4-1968-42'
+Line 1203: unexpected catalog number: 'OMO 57/4-1972-147'
+Line 1204: unexpected catalog number: 'OMO 57/4-1972-148'
+Line 1205: unexpected catalog number: 'OMO 57/5-1972-123'
+Line 1206: unexpected catalog number: 'OMO 57/5-1972-197'
+Line 1207: unexpected catalog number: 'OMO 57/5-1972-319'
+Line 1208: unexpected catalog number: 'OMO 57/5-1972-320'
+Line 1209: unexpected catalog number: 'OMO 57/5-1972-370'
+Line 1210: unexpected catalog number: 'OMO 57/5-1972-371'
+Line 1211: unexpected catalog number: 'OMO 57/5-1972-372'
+Line 1212: unexpected catalog number: 'OMO 57/6-1972-244'
+Line 1213: unexpected catalog number: 'OMO 69-1974-900'
+Line 1214: unexpected catalog number: 'OMO 74-1969-18'
+Line 1215: unexpected catalog number: 'OMO 75-1969-14a'
+Line 1216: unexpected catalog number: 'OMO 75-1969-14b'
+Line 1217: unexpected catalog number: 'OMO 75/i-1970-1255'
+Line 1218: unexpected catalog number: 'OMO 75/s-1969-15'
+Line 1219: unexpected catalog number: 'OMO 75/s-1969-16'
+Line 1220: unexpected catalog number: 'OMO 75/s-1970-1317'
+Line 1221: unexpected catalog number: 'OMO 75/s-1970-875'
+Line 1222: unexpected catalog number: 'OMO 76-1969-13'
+Line 1223: unexpected catalog number: 'OMO 76-1972-37'
+Line 1224: unexpected catalog number: 'OMO 76-1972-38'
+Line 1225: unexpected catalog number: 'OMO 76/r-1969-11'
+Line 1226: unexpected catalog number: 'OMO 76/r-1969-12'
+Line 1227: unexpected catalog number: 'OMO 84-10001'
+Line 1228: unexpected catalog number: 'OMO 84-1970-100'
+Line 1229: unexpected catalog number: 'OMO K 7-1969-19'
+Line 1230: unexpected catalog number: 'OMO Sh 1/1-1969-17'
+Line 1231: unexpected catalog number: 'P 933-1'
+Line 1232: unexpected catalog number: 'P 996-17a'
+Line 1233: unexpected catalog number: 'P 996-17b'
+Line 1234: unexpected catalog number: 'W 7-23'
+Line 1235: unexpected catalog number: 'W 7-508'
+Line 1236: unexpected catalog number: 'W 7-559i'
+Line 1237: unexpected catalog number: 'W 7-578'
+Line 1238: unexpected catalog number: 'W 8-749'
+Line 1239: unexpected catalog number: 'W 8-750'
+Line 1240: unexpected catalog number: 'W 8-751'
+Line 1241: unexpected catalog number: 'W 8-752'
+Line 1242: unexpected catalog number: 'W 8-753'
+Line 1243: unexpected catalog number: 'W 8-978'
+
+Check complete. Problems logged to: bad_catalog_numbers.log
+
+
+QUESTIONS:
+
+1. What does IFS=$'\t' read -r CATALOG_NUM REST do? What is IFS and why does it matter here?
+  - IFS is the Internal Field Separator that the shell variable provides to read. It can also be adjusted to control the separation of field input to read. 
+
+2. What does [[ "$CATALOG_NUM" != "$PREFIX"* ]] do? Why is [[ ]] used instead of [ ]?
+  - [[ "$CATALOG_NUM" != "$PREFIX"* ]] tests whether the catalog number (CATALOG_NUM) does not start in a prefix. [[ ]] supports all expressions but adds a new string expression. It also supports pattern matching. [ ] treats arguments like strings. 
+
+3. What does tee -a "$LOG_FILE" do? What is the difference between tee and simple redirection?
+  - tee -a "$LOG_FILE" allows the unexpected catalog number to be shown in the terminal. Simple redirection sends the output only to the file, nothing is seen in the terminal.
+
+4. The while loop uses a subshell which means BAD_COUNT inside the loop is not accessible outside it. This is a known limitation. Look up the lastpipe bash option or the process substitution pattern while ... done < <(...) and briefly explain what they do.
+  - lastpipe changes how a pipe works. It makes the last command in the pipeline run in the current shell instead of in the subshell like a regular pipeline.
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+## PART 4 - THE SYNTHESIS SCRIPT
+
+INPUT 
+chmod +x dataset_report.sh
+./dataset_report.sh ~/Documents/UT/comp_paleo/part1_OS/week03/
+
+OUTPUT
+Directory: /Users/jyhrehjohnson/Documents/UT/comp_paleo/part1_OS/week03/
+Generated: 2026-09-15 19:15:49
+============================================================
+
+File: eppe_fossils.tsv
+  Rows:    13716
+  Columns: 31
+  Fields:  catalog_number | institution_code | collection_code
+  Validation: PASS
+
+File: otb_fossils.tsv
+  Rows:    1242
+  Columns: 30
+  Fields:  catalog_number | organism_id | preparations
+  Validation: PASS
+
+File: specimens_summary_short.tsv
+  Rows:    1243
+  Columns: 3
+  Fields:  catalog_number | formation | scientific_name
+  Validation: PASS
+
+File: specimens_summary.tsv
+  Rows:    1243
+  Columns: 3
+  Fields:  catalog_number | formation | scientific_name
+  Validation: PASS
+
+============================================================
+Summary
+  Files processed: 4
+  Total rows:      17444
+  Small files:     0
+  Overall result:  PASS
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+## PART 5 - PYTHON SCRIPT
+QUESTIONS:
+
+1. How is variable assignment in Python differ from bash?
+  - In terms of syntax, Python is more flexible than bash, particularly with spaces. Which makes sense as to why I had "space" issues for the week03 assignment. Variable names in Python can be used directly. However, in bash you need a $ for input.   
+
+2. How are for loops constructed in Python compared to bash?
+  - for loops in Python loop over the data set in the loop. In bash, the for loop loops over whitespace or spaces.
+
+3. What role might indentation play in Python compared to bash?
+  - Indentation in Python is needed for its grammatical function. Indentation tells Python which statements belong together inside functions or are isolated as their own pieces of code. 
+
+4. What does for i, row in enumerate(reader) do? Why are there two variables after the for command?
+  - It keeps track of the index row and the data.
+
+5. How does the Python function capture arguments? If the fix_newlines function is written to accept two arguments, input_path and output_path why does the validation check on line 43, if len(sys.argv) != 3:, expect three arguments?
+  - The Python function captures the arguments based on their position when it's called in the function. It expects 3 arguments because, by default, sys.argv also includes the script's name in the length, so there are 3 arguments even though 2 are actually needed for the function. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

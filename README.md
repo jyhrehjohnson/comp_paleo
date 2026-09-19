@@ -3,12 +3,12 @@
 This project consists of a collection of shell scripts from Weeks 1-4. The goal for Weeks 1-was to learn how to acquire, clean, and summarize data from the command line. The scripts were written over the first four weeks of this computational paleobiology course. They cover navigating file systems, text processing,  and manipulating real fossil data. The scripts are written to be read and reused by anyone.
 
 
-### Course context 
+## Course context
 Course Name: Computational Paleobiology
 Institution: The University of Texas at Austin
 Semester: Fall 2026
 
-### Repository structure — a brief description of what is in each subdirectory
+## Repository structure — a brief description of what is in each subdirectory
 comp_paleo/
 
 ├── README.md              # current file
@@ -25,14 +25,14 @@ comp_paleo/
 
     └── week04/            # [Pipeline scripts]
 
-### Dependencies — what software is needed to run these scripts (bash version, OS, any tools like awk/sed)
+## Dependencies — what software is needed to run these scripts (bash version, OS, any tools like awk/sed)
 - OS: macOS
 
 - Shell: bash or zsh
 
 - Tools: awk, sed, grep, sort, cut, curl
 
-### Usage — how to run the scripts, with at least two concrete examples
+## Usage — how to run the scripts, with at least two concrete examples
 Make a script executable once, then run it from the repository root:
 
 ```bash
@@ -67,7 +67,7 @@ mkdir -p data/raw data/processed
 
 ```
 
-### Data — where to obtain the datasets the scripts expect (PBDB API URL, Origins database URL)
+## Data — where to obtain the datasets the scripts expect (PBDB API URL, Origins database URL)
 Data files are not stored in this repository. To reproduce the analyses, download them yourself:
 
 

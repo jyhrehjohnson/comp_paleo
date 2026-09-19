@@ -34,35 +34,12 @@ Semester: Fall 2026
 - Tools: awk, sed, grep, sort, cut, curl
 
 ## Usage
-Make a script executable once, then run it from the repository root:
-
-chmod +x part01_OS/week03/[script_name].sh
-
-./part01_OS/week03/[script_name].sh [arguments] 
-
-#part01 is named as part1 in my files, but I know for you they are under part01
 
 
-Example 1: [what it does]
-
-./part01_OS/week0N/[script1].sh [args] 
-
-#part01 is named as part1 in my files, but I know for you they are under part01
-
-
-Example 2: [what it does]
-
-./part01_OS/week0N/[script2].sh [args]
-
-
-Scripts expect input data in `data/raw/` and write results to `data/processed/`. Both directories are ignored by Git (see Data below), so create them locally:
-
-
-mkdir -p data/raw data/processed
 
 
 ## Data
-Data files are not stored in this repository. To reproduce the analyses, download them yourself:
+
 
 
 

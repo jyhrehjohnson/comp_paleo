@@ -26,14 +26,14 @@ Semester: Fall 2026
     
     └── week04/            #Pipeline scripts
 
-## Dependencies — what software is needed to run these scripts (bash version, OS, any tools like awk/sed)
+## Dependencies
 - OS: macOS
 
 - Shell: bash or zsh
 
 - Tools: awk, sed, grep, sort, cut, curl
 
-## Usage — how to run the scripts, with at least two concrete examples
+## Usage
 Make a script executable once, then run it from the repository root:
 
 ```bash

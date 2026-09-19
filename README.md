@@ -66,7 +66,7 @@ Data files are not stored in this repository. To reproduce the analyses, downloa
 
 
 
-### Author name and contact
+## Author name and contact
 Author: Jyhreh Johnson
 
 Email: jyhrehj@utexas.edu

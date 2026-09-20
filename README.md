@@ -10,7 +10,7 @@ Institution: The University of Texas at Austin
 
 Semester: Fall 2026
 
-## Repository structure
+### Repository structure
 
 ├── README.md              #current file
 

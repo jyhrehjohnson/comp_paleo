@@ -1,9 +1,9 @@
-### Computational Paleobiology Course Repository
-## Description:
+## Computational Paleobiology Course Repository
+### Description:
 This project consists of a collection of shell scripts from Weeks 1-4. The goal for Weeks 1-was to learn how to acquire, clean, and summarize data from the command line. The scripts were written over the first four weeks of this computational paleobiology course. They cover navigating file systems, text processing,  and manipulating real fossil data. The scripts are written to be read and reused by anyone.
 
 
-## Course context
+### Course context
 Course Name: Computational Paleobiology
 
 Institution: The University of Texas at Austin
@@ -26,14 +26,14 @@ Semester: Fall 2026
     
     └── week04/            #Pipeline scripts
 
-## Dependencies
+### Dependencies
 - OS: macOS
 
 - Shell: bash or zsh
 
 - Tools: awk, sed, grep, sort, cut, curl
 
-## Usage
+### Usage
 
 Make Week04 scripts executable
 
@@ -75,7 +75,7 @@ Example 2: a for loop meant to count and return the .tsv fossils within the week
     otb_fossils.tsv                          1242        30
 
 
-## Data
+### Data
 The data for Weeks 1-4 are the Omo-Turkana Basin (OTB) and EPPE hominin fossil datasets from the Origins database. (https://paleocore.org/origins/)
 
 

@@ -16,15 +16,15 @@ Semester: Fall 2026
 
 ├── .gitignore             #excludes data files and OS files
 
-└── part01_OS/
+└── part01_OS/            #my part subfolders or named part1, part2, part3 rather than part01..02..03 but for the structure I will use part01
 
-    ├── week01/            #System/file navigation and basic shell commands
+    ├── week01/            #Week01 consisted of us learning about system/file navigation and basic shell commands
     
-    ├── week02/            #Text processing with grep, cut, sort, uniq
+    ├── week02/            #Week02 we progressed to text processing with grep, cut, sort, uniq
     
-    ├── week03/            #Data cleaning
+    ├── week03/            #Week03 we focused on Pipeline scripts
     
-    └── week04/            #Pipeline scripts
+    └── week04/            #Week04 was about for loops and iterations
 
 ### Dependencies
 - OS: macOS

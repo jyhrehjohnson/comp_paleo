@@ -1,16 +1,16 @@
 ## Computational Paleobiology Course Repository
-### Description:
+### Description
 This project consists of a collection of shell scripts from Weeks 1-4. The goal for Weeks 1-was to learn how to acquire, clean, and summarize data from the command line. The scripts were written over the first four weeks of this computational paleobiology course. They cover navigating file systems, text processing,  and manipulating real fossil data. The scripts are written to be read and reused by anyone.
 
 
-### Course context
+### Course Context
 Course Name: Computational Paleobiology
 
 Institution: The University of Texas at Austin
 
 Semester: Fall 2026
 
-### Repository structure
+### Repository Structure
 
 ├── README.md              #current file
 

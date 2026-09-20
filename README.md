@@ -76,8 +76,7 @@ Example 2: a for loop meant to count and return the .tsv fossils within the week
 
 
 ## Data
-
-
+The data for Weeks 1-4 are the Omo-Turkana Basin (OTB) and EPPE fossil datasets from the Origins database. (https://paleocore.org/origins/)
 
 
 ## Author name and contact

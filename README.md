@@ -18,7 +18,7 @@ Semester: Fall 2026
 
 └── part01_OS/
 
-    ├── week01/            #File system navigation and basic shell commands
+    ├── week01/            #System/file navigation and basic shell commands
     
     ├── week02/            #Text processing with grep, cut, sort, uniq
     

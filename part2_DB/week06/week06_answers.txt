@@ -54,6 +54,7 @@ White Sands
 
 
 ### 1.2 Identify Anomalies
+
 Update anomaly: If the spelling of a formation name is incorrect — for example, "Koobi Fora" is mistakenly stored as "Koobi Forah" in 601 rows — how many rows would you have to update to fix it? What could go wrong during that update?
 
   - You have to update the 601 rows to fix the incorrect spelling. During the update, you can accidentally change each row in the database or end up two spellings for the formation name.
@@ -64,7 +65,7 @@ Insertion anomaly: You want to record a new fossil locality — South Turkwel �
 
 Deletion anomaly: Every specimen from the Usno Formation is removed from the dataset. What other information about the Usno Formation is lost when those rows are deleted?
 
-  - Everything known about the Usno Formation would be deleted 
+  - Everything known about the Usno Formation would be deleted. 
 
 
 Redundancy: The values for country, state_province, subregion, and region are repeated on every row for a given place. For the 601 Koobi Fora specimens, how many times is the value Kenya stored in the country column? What does this mean for the risk of inconsistency?
@@ -100,10 +101,11 @@ Questions to answer:
 
 5. Why is catalog_number a better primary key for fossils than an auto-incrementing integer in this particular dataset?
 
-  - A catalog number is better as a primary key for fossils because they are already unique identifiers attached to existing skeletal elements. Having a catalog number and auto-generated ID can become confusing and could lead to the same specimen being entered twice with different generated IDs.
+  - A catalog number is better as a primary key for fossils because they are already unique identifiers attached to existing skeletal elements. Having a catalog number and auto-generated ID can become confusing and could lead to the same specimen being entered twice with different generated IDs. Also, when specimens were logged they already included a catalog number within those recorded databases or tables. 
 
 
 ### 2.3 Draw the ER diagram
+
 Questions to answer:
 
 6. What is the cardinality of the relationship between localities and fossils? (How many fossils can belong to one locality? How many localities can a fossil belong to?)

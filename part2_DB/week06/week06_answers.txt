@@ -1,0 +1,838 @@
+Jyhreh Johnson
+
+## PART 1 - THE PROBLEM WITH FLAT FILES
+
+### 1.1 Inspect the flat file
+INPUT:
+# How many rows and columns?
+wc -l otb_fossils.tsv
+head -1 otb_fossils.tsv | tr '\t' '\n' | wc -l
+
+# How many unique taxa (scientific names)?
+tail -n +2 otb_fossils.tsv | cut -f22 | sort -u | wc -l
+
+# Which formations are represented?
+tail -n +2 otb_fossils.tsv | cut -f19 | sort -u | grep -v '^$'
+
+# Which places are represented?
+tail -n +2 otb_fossils.tsv | cut -f11 | sort -u | grep -v '^$'
+
+OUTPUT:
+# How many rows and columns?
+1243 otb_fossils.tsv
+      30
+
+# How many unique taxa (scientific names)?
+      10
+
+# Which formations are represented?
+Kanapoi
+Koobi Fora
+Nachukui
+Nawata
+Shungura
+Usno
+
+# Which places are represented?
+Allia Bay
+Brown Sands
+Fejej
+Ileret
+Kalam Area
+Kanapoi
+Koobi Fora
+Lothagam
+Nachukui
+South Turkwel
+Type Area
+White Sands
+
+
+### 1.2 Identify Anomalies
+Update anomaly: If the spelling of a formation name is incorrect — for example, "Koobi Fora" is mistakenly stored as "Koobi Forah" in 601 rows — how many rows would you have to update to fix it? What could go wrong during that update?
+
+  - You have to update the 601 rows to fix the incorrect spelling. During the update, you can accidentally change each row in the database or end up two spellings for the formation name.
+
+Insertion anomaly: You want to record a new fossil locality — South Turkwel — before any specimens have been collected there. Can you add it to the flat file? Why or why not?
+
+  - No, every row represents a specimen, so you'd have to introduce placeholder data or a blank row to add anything. 
+
+Deletion anomaly: Every specimen from the Usno Formation is removed from the dataset. What other information about the Usno Formation is lost when those rows are deleted?
+
+  - Everything known about the Usno Formation would be deleted 
+
+
+Redundancy: The values for country, state_province, subregion, and region are repeated on every row for a given place. For the 601 Koobi Fora specimens, how many times is the value Kenya stored in the country column? What does this mean for the risk of inconsistency?
+
+  - 'Kenya' is stored 601 times, in terms of inconsistency nothing is forcing the copies to agree with one another. 
+
+Questions to answer:
+1. In one paragraph, explain why the flat file structure causes these problems.
+
+  - A flat file mixes data about different entities in one row. It includes facts about the specimen: catalog number, element, finder, year, etc. Because place and taxon data are attached to specimens, they are copied onto every specimen that shares them. This is how the abnormalities happen. Fixing the data means editing each copy (Update). A taxon or place cannot exist without a specimen (Insertion), and removing a specimen removes the place or taxon (Deletion). Then the copies are redundant. 
+
+2. What is the fundamental principle that a relational database uses to solve them?
+
+  - Normalization
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+## PART 2 - ENTITY-RELATIONSHIP DESIGN
+
+### 2.1 Identify the Entities
+
+### 2.2 Identify the attributes
+Questions to answer:
+
+3. Why does formation belong in localities rather than fossils?
+
+  - A formation is a property where a fossil is found. All other fossils from the assemblage will share the same formation and locality. 
+
+4. What is a foreign key and what does it enforce?
+
+  - A foreign key is a column of values that must match the primary key in another table. It enforces relational integrity within the database. An item can't point to a column that doesn't exist.
+
+5. Why is catalog_number a better primary key for fossils than an auto-incrementing integer in this particular dataset?
+
+  - A catalog number is better as a primary key for fossils because they are already unique identifiers attached to existing skeletal elements. Having a catalog number and auto-generated ID can become confusing and could lead to the same specimen being entered twice with different generated IDs.
+
+
+### 2.3 Draw the ER diagram
+Questions to answer:
+
+6. What is the cardinality of the relationship between localities and fossils? (How many fossils can belong to one locality? How many localities can a fossil belong to?)
+
+  - This is a one-to-many relationship where one locality can have many fossils and many fossils can belong to one locality. 
+
+7. What is the cardinality of the relationship between taxa and fossils?
+
+  - One-to-many. One taxa can have many fossils assigned to it. 
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+## PART 3 - CREATE THE SCHEMA IN POSTGRESQL
+INPUT
+psql informatics -c "\dt"
+
+OUTPUT 
+List of relations
+ Schema |    Name    | Type  |     Owner     
+--------+------------+-------+---------------
+ public | fossils    | table | jyhrehjohnson
+ public | localities | table | jyhrehjohnson
+ public | taxa       | table | jyhrehjohnson
+(3 rows)
+
+INPUT
+psql informatics -c "\d fossils"
+
+OUTPUT
+Table "public.fossils"
+          Column           |  Type   | Collation | Nullable | Default 
+---------------------------+---------+-----------+----------+---------
+ catalog_number            | text    |           | not null | 
+ organism_id               | text    |           |          | 
+ preparations              | text    |           |          | 
+ year                      | integer |           |          | 
+ discovered_by             | text    |           |          | 
+ taxon_id                  | integer |           |          | 
+ locality_id               | integer |           |          | 
+ earliest_epoch            | text    |           |          | 
+ latest_epoch              | text    |           |          | 
+ earliest_chronometric_age | numeric |           |          | 
+ latest_chronometric_age   | numeric |           |          | 
+ verbatim_chronometric_age | text    |           |          | 
+Indexes:
+    "fossils_pkey" PRIMARY KEY, btree (catalog_number)
+Foreign-key constraints:
+    "fossils_locality_id_fkey" FOREIGN KEY (locality_id) REFERENCES localities(locality_id)
+    "fossils_taxon_id_fkey" FOREIGN KEY (taxon_id) REFERENCES taxa(taxon_id)
+
+Questions to answer:
+
+8. What does SERIAL PRIMARY KEY do that INTEGER PRIMARY KEY does not?
+
+  - A SERIAL PRIMARY KEY creates a background sequence of sequential values for each new row. It automatically inserts the next number; INTEGER PRIMARY KEYs require you to input the numbers manually. 
+
+9. What does REFERENCES taxa(taxon_id) enforce? Write a one-sentence explanation of what PostgreSQL will do if you try to insert a row into fossils with a taxon_id that does not exist in taxa.
+
+  - Every non-null taxon_id in fossils must exist in taxa. 
+
+10. Why are earliest_chronometric_age and latest_chronometric_age stored as NUMERIC rather than TEXT, even though they came from a text file?
+
+  - It is easier to compare and query NUMERIC values rather than TEXT. TEXT compares character by character. NUMERIC stores the values as numbers and makes the database reject non-numbers. 
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+## PART 4 - LOAD THE DATA
+
+INPUT
+psql informatics < data.sql
+
+OUTPUT
+INSERT 0 23
+INSERT 0 47
+INSERT 0 1243
+ setval 
+--------
+     23
+(1 row)
+
+ setval 
+--------
+     47
+(1 row)
+
+### 4.1 Verify the load
+INPUT
+psql informatics -c "SELECT COUNT(*) FROM taxa;"
+psql informatics -c "SELECT COUNT(*) FROM localities;"
+psql informatics -c "SELECT COUNT(*) FROM fossils;"
+
+OUTPUT
+count 
+-------
+    23
+(1 row)
+
+ count 
+-------
+    47
+(1 row)
+
+ count 
+-------
+  1243
+(1 row)
+
+INPUT
+psql informatics -c "SELECT * FROM taxa ORDER BY taxon_id LIMIT 8;"
+psql informatics -c "SELECT * FROM localities ORDER BY locality_id LIMIT 5;"
+psql informatics -c "SELECT * FROM fossils LIMIT 3;"
+
+OUTPUT
+taxon_id |                   scientific_name                    | identification_qualifier 
+----------+------------------------------------------------------+--------------------------
+        1 | Australopithecus Dart, 1925                          | 
+        2 | Hominini                                             | 
+        3 | Paranthropus boisei (Leakey, 1959)                   | 
+        4 | Paranthropus aethiopicus (Arambourg & Coppens, 1967) | 
+        5 | Homo Linnaeus, 1758                                  | aff habilis
+        6 | Australopithecus anamensis Leakey et al., 1995       | 
+        7 | Homo Linnaeus, 1758                                  | 
+        8 | Hominini                                             | cf. Homo aff. erectus
+(8 rows)
+
+ locality_id |    place    |   subregion   | country  | state_province | formation | member 
+-------------+-------------+---------------+----------+----------------+-----------+--------
+           1 | Brown Sands | North Turkana | Ethiopia | South Ethiopia | Usno      | U-12
+           2 | Kalam Area  | North Turkana | Ethiopia | South Ethiopia | Shungura  | J to L
+           3 | Kalam Area  | North Turkana | Ethiopia | South Ethiopia | Shungura  | K
+           4 | Kalam Area  | North Turkana | Ethiopia | South Ethiopia | Shungura  | F
+           5 | Type Area   | North Turkana | Ethiopia | South Ethiopia | Shungura  | H
+(5 rows)
+
+ catalog_number | organism_id | preparations | year | discovered_by | taxon_id | locality_id | earliest_epoch | latest_epoch | earliest_chronometric_age | latest_chronometric_age | verbatim_chronometric_age 
+----------------+-------------+--------------+------+---------------+----------+-------------+----------------+--------------+---------------------------+-------------------------+---------------------------
+ B 7-39a        | B 7-39      | Tooth        | 1967 |               |        1 |           1 | Pliocene       | Pliocene     |                      3.05 |                    3.05 | ~3.05
+ B 7-39b        | B 7-39      | Tooth        | 1967 |               |        1 |           1 | Pliocene       | Pliocene     |                      3.05 |                    3.05 | ~3.05
+ B 7-39c        | B 7-39      | Tooth        | 1967 |               |        1 |           1 | Pliocene       | Pliocene     |                      3.05 |                    3.05 | ~3.05
+(3 rows)
+
+
+
+### 4.2 Inspect the data.sql file
+
+Questions to answer:
+
+11. Paste the output of the three COUNT(*) queries.
+  - count 
+-------
+    23
+(1 row)
+
+ count 
+-------
+    47
+(1 row)
+
+ count 
+-------
+  1243
+(1 row)
+
+12. The taxa table has 23 rows but the fossils table has 1,243 rows. Why are there far fewer taxa than fossils? What does this tell you about the OTB hominin record?
+
+  - The 1,243 fossil specimens fall into only 23 distinct taxa within this database. The species are represented by multiple pieces, and many are cataloged separately. This shows how fragmentary the OTB hominin record is. There appear to be no diagnostic individuals. 
+
+13. Open data.sql and find a fossil row that has NULL for discovered_by. What does storing NULL mean, and why is it better than storing an empty string ''?
+
+  - NULL is a missing or unknown value its not a text string. '' is an acceptable value in SQL. NULL tells the database there is no value that is stored.
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+## PART 5 - SQL QUERIES
+
+INPUT 
+psql informatics < queries.sql
+
+OUTPUT
+count 
+-------
+  1243
+(1 row)
+
+ catalog_number | preparations | year 
+----------------+--------------+------
+ KNM-ER 404     | Mandible     | 1968
+ KNM-ER 728     | Mandible     | 1970
+ KNM-ER 731     | Mandible     | 1970
+ KNM-ER 999g    | Postcranium  | 1971
+ KNM-ER 999f    | Postcranium  | 1971
+ KNM-ER 999d    | Postcranium  | 1971
+ KNM-ER 999c    | Postcranium  | 1971
+ KNM-ER 999b    | Postcranium  | 1971
+ KNM-ER 999a    | Postcranium  | 1971
+ KNM-ER 993     | Postcranium  | 1971
+ KNM-ER 809b    | Tooth        | 1971
+ KNM-ER 809a    | Tooth        | 1971
+ KNM-ER 805b    | Mandible     | 1971
+ KNM-ER 805a    | Mandible     | 1971
+ KNM-ER 999e    | Postcranium  | 1971
+ KNM-ER 1476b   | Postcranium  | 1972
+ KNM-ER 1476c   | Postcranium  | 1972
+ KNM-ER 1465a   | Postcranium  | 1972
+ KNM-ER 1465b   | Postcranium  | 1972
+ KNM-ER 1475a   | Postcranium  | 1972
+ KNM-ER 1476a   | Postcranium  | 1972
+ KNM-ER 1463    | Postcranium  | 1972
+ KNM-ER 1469    | Mandible     | 1972
+ KNM-ER 1475b   | Postcranium  | 1972
+ KNM-ER 1808t   | Postcranium  | 1973
+ KNM-ER 1808u   | Postcranium  | 1973
+ KNM-ER 1808v   | Postcranium  | 1973
+ KNM-ER 1808w   | Postcranium  | 1973
+ KNM-ER 1808x   | Postcranium  | 1973
+ KNM-ER 1808y   | Postcranium  | 1973
+ KNM-ER 1808z   | Postcranium  | 1973
+ KNM-ER 1809    | Postcranium  | 1973
+ KNM-ER 1813a   | Cranium      | 1973
+ KNM-ER 1813b   | Cranium      | 1973
+ KNM-ER 1820    | Mandible     | 1973
+ KNM-ER 1822    | Tooth        | 1973
+ KNM-ER 1808o   | Postcranium  | 1973
+ KNM-ER 1807    | Postcranium  | 1973
+ KNM-ER 1808a   | Mandible     | 1973
+ KNM-ER 1808aa  | Cranium      | 1973
+ KNM-ER 1808ab  | Postcranium  | 1973
+ KNM-ER 1808ae  | Postcranium  | 1973
+ KNM-ER 1808am  | Postcranium  | 1973
+ KNM-ER 1808b   | Mandible     | 1973
+ KNM-ER 1808c   | Cranium      | 1973
+ KNM-ER 1808d   | Mandible     | 1973
+ KNM-ER 1808e   | Tooth        | 1973
+ KNM-ER 1808f   | Tooth        | 1973
+ KNM-ER 1808g   | Tooth        | 1973
+ KNM-ER 1808h   | Tooth        | 1973
+ KNM-ER 1808i   | Tooth        | 1973
+ KNM-ER 1808j   | Cranium      | 1973
+ KNM-ER 1808k   | Cranium      | 1973
+ KNM-ER 1808l   | Cranium      | 1973
+ KNM-ER 1808m   | Postcranium  | 1973
+ KNM-ER 1808n   | Postcranium  | 1973
+ KNM-ER 1808p   | Postcranium  | 1973
+ KNM-ER 1808q   | Postcranium  | 1973
+ KNM-ER 1808r   | Postcranium  | 1973
+ KNM-ER 1808s   | Postcranium  | 1973
+ KNM-ER 807b    | Cranium      | 1973
+ KNM-ER 2597    | Tooth        | 1974
+ KNM-ER 2603    | Tooth        | 1974
+ KNM-ER 3735h   | Postcranium  | 1975
+ KNM-ER 3735g   | Postcranium  | 1975
+ KNM-ER 3735f   | Postcranium  | 1975
+ KNM-ER 3735e   | Postcranium  | 1975
+ KNM-ER 3735d   | Postcranium  | 1975
+ KNM-ER 3735c   | Cranium      | 1975
+ KNM-ER 3735b   | Cranium      | 1975
+ KNM-ER 3735a   | Cranium      | 1975
+ KNM-ER 3729    | Mandible     | 1975
+ KNM-ER 3735j   | Postcranium  | 1975
+ KNM-ER 3735i   | Postcranium  | 1975
+ KNM-ER 5884    | Tooth        | 1980
+ KNM-WT 15000bn | Postcranium  | 1984
+ KNM-WT 15000u  | Postcranium  | 1984
+ KNM-WT 15000v  | Postcranium  | 1984
+ KNM-WT 15000w  | Postcranium  | 1984
+ KNM-WT 15000x  | Postcranium  | 1984
+ KNM-WT 15000y  | Postcranium  | 1984
+ KNM-WT 15000z  | Postcranium  | 1984
+ KNM-WT 15000a  | Cranium      | 1984
+ KNM-WT 15000aa | Postcranium  | 1984
+ KNM-WT 15000ab | Postcranium  | 1984
+ KNM-WT 15000ac | Postcranium  | 1984
+ KNM-WT 15000ad | Postcranium  | 1984
+ KNM-WT 15000ae | Postcranium  | 1984
+ KNM-WT 15000af | Postcranium  | 1984
+ KNM-WT 15000ag | Postcranium  | 1984
+ KNM-WT 15000ah | Postcranium  | 1984
+ KNM-WT 15000ai | Postcranium  | 1984
+ KNM-WT 15000aj | Postcranium  | 1984
+ KNM-WT 15000ak | Postcranium  | 1984
+ KNM-WT 15000al | Postcranium  | 1984
+ KNM-WT 15000am | Postcranium  | 1984
+ KNM-WT 15000an | Postcranium  | 1984
+ KNM-WT 15000ao | Postcranium  | 1984
+ KNM-WT 15000ap | Postcranium  | 1984
+ KNM-WT 15000aq | Postcranium  | 1984
+ KNM-WT 15000ar | Postcranium  | 1984
+ KNM-WT 15000as | Postcranium  | 1984
+ KNM-WT 15000at | Postcranium  | 1984
+ KNM-WT 15000au | Postcranium  | 1984
+ KNM-WT 15000av | Postcranium  | 1984
+ KNM-WT 15000aw | Postcranium  | 1984
+ KNM-WT 15000ax | Postcranium  | 1984
+ KNM-WT 15000ay | Postcranium  | 1984
+ KNM-WT 15000az | Postcranium  | 1984
+ KNM-WT 15000b  | Mandible     | 1984
+ KNM-WT 15000ba | Postcranium  | 1984
+ KNM-WT 15000bb | Postcranium  | 1984
+ KNM-WT 15000bc | Postcranium  | 1984
+ KNM-WT 15000bd | Postcranium  | 1984
+ KNM-WT 15000be | Postcranium  | 1984
+ KNM-WT 15000bf | Postcranium  | 1984
+ KNM-WT 15000bg | Postcranium  | 1984
+ KNM-WT 15000bh | Postcranium  | 1984
+ KNM-WT 15000bi | Postcranium  | 1984
+ KNM-WT 15000bj | Postcranium  | 1984
+ KNM-WT 15000bk | Postcranium  | 1984
+ KNM-WT 15000bl | Postcranium  | 1984
+ KNM-WT 15000bm | Postcranium  | 1984
+ KNM-WT 15000bo | Postcranium  | 1984
+ KNM-WT 15000bp | Postcranium  | 1984
+ KNM-WT 15000bq | Postcranium  | 1984
+ KNM-WT 15000bs | Postcranium  | 1984
+ KNM-WT 15000bu | Postcranium  | 1984
+ KNM-WT 15000bv | Postcranium  | 1984
+ KNM-WT 15000bw | Postcranium  | 1984
+ KNM-WT 15000bx | Postcranium  | 1984
+ KNM-WT 15000by | Postcranium  | 1984
+ KNM-WT 15000bz | Postcranium  | 1984
+ KNM-WT 15000c  | Postcranium  | 1984
+ KNM-WT 15000ca | Postcranium  | 1984
+ KNM-WT 15000cb | Postcranium  | 1984
+ KNM-WT 15000d  | Postcranium  | 1984
+ KNM-WT 15000e  | Postcranium  | 1984
+ KNM-WT 15000f  | Postcranium  | 1984
+ KNM-WT 15000g  | Postcranium  | 1984
+ KNM-WT 15000h  | Postcranium  | 1984
+ KNM-WT 15000i  | Postcranium  | 1984
+ KNM-WT 15000j  | Postcranium  | 1984
+ KNM-WT 15000k  | Postcranium  | 1984
+ KNM-WT 15000l  | Postcranium  | 1984
+ KNM-WT 15000m  | Postcranium  | 1984
+ KNM-WT 15000n  | Postcranium  | 1984
+ KNM-WT 15000o  | Postcranium  | 1984
+ KNM-WT 15000p  | Postcranium  | 1984
+ KNM-WT 15000q  | Postcranium  | 1984
+ KNM-WT 15000r  | Postcranium  | 1984
+ KNM-WT 15000s  | Postcranium  | 1984
+ KNM-WT 15000t  | Postcranium  | 1984
+ KNM-WT 18600   | Tooth        | 1986
+ KNM-WT 19700   | Postcranium  | 1988
+ KNM-KP 29285a  | Postcranium  | 1994
+ KNM-ER 30200b  | Cranium      | 1995
+ KNM-ER 30200a  | Cranium      | 1995
+ KNM-KP 31726   | Tooth        | 1996
+(159 rows)
+
+ formation  | n_specimens 
+------------+-------------
+ Koobi Fora |         591
+ Shungura   |         258
+ Kanapoi    |         188
+ Nachukui   |         182
+ Usno       |          22
+ Nawata     |           2
+(6 rows)
+
+   catalog_number   |                scientific_name                 | earliest_chronometric_age | formation  
+--------------------+------------------------------------------------+---------------------------+------------
+ KNM-LT 25935       | Hominini                                       |                       6.5 | Nawata
+ KNM-LT 22930       | Hominini                                       |                       6.5 | Nawata
+ KNM-LT 329         | Hominini                                       |                       5.0 | Nachukui
+ KNM-ER 63000       | Australopithecus anamensis Leakey et al., 1995 |                       4.3 | Koobi Fora
+ KNM-KP 35843       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725n      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725o      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725p      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725q      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725r      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725s      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725t      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725u      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725v      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35838       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35839a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35839b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35839c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35840a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35840b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35840c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35840d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35841       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35842       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35844       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35845       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35847       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35850       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35851       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 35852       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 37522       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 37523       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 37524       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47951f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47952a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47952b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47952c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47952d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953k      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953l      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47953m      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47954       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47955       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47956       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 47957       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 49388       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 52120       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 53160       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58309       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58310       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58311       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58312       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58313       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58314       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58315       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58316       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58428       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58429       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58430       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58759       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58760       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 58761       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 59499       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 59503       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-ER 7727        | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Koobi Fora
+ KNM-KP 29281a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29281b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29282       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29283a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29283b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29284a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29284b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29286j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 29288       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498k      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30498l      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500k      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30500l      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30502a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30502b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30502c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30502d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30502e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30503       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30505       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 30942       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31712k      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31713a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31713b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31713c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31714       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31715a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31715b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31715c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31716a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31716b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31717a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31717b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31717c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31718       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31719       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31720       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31721a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31721b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31723       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31724       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31726       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31727       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31728       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31729       | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31730a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31730b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31732a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 31732b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725a      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725b      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725c      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725d      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725e      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725f      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725g      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725h      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725i      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725j      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725k      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 34725l      | Australopithecus anamensis Leakey et al., 1995 |                       4.2 | Kanapoi
+ KNM-KP 77321       | Australopithecus anamensis Leakey et al., 1995 |                     4.195 | Kanapoi
+ KNM-KP 271         | Australopithecus anamensis Leakey et al., 1995 |                      4.12 | Kanapoi
+ KNM-KP 29285b      | Australopithecus anamensis Leakey et al., 1995 |                      4.12 | Kanapoi
+ KNM-KP 29285a      | Australopithecus anamensis Leakey et al., 1995 |                      4.12 | Kanapoi
+ KNM-ER 20428       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20425       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20426       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20427       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20429       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20431       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20432       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 22683       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 24148       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 30202       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 30731       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 30744       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 30745       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 30750       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35228       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35229       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35230       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35231       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35232       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35233       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35234       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35235       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35236       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35237       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35238       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 35299       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1a         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1b         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1c         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1d         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1e         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-1f         | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ FJ-4-SB-2          | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20430       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 18536       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 18538       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 18539       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 18540       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 19981       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20419       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20420       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20421       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20422       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20423       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-ER 20424       | Australopithecus anamensis Leakey et al., 1995 |                       4.0 | Koobi Fora
+ KNM-WT 22944h      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944g      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944f      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944e      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944d      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944c      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944b      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944a      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22936       | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944j      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944k      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 22944i      | Hominini                                       |                      3.58 | Nachukui
+ KNM-WT 40000       | Kenyanthropus platyops Leakey et al., 2001     |                      3.57 | Nachukui
+ KNM-WT 38341       | Hominini                                       |                      3.53 | Nachukui
+ KNM-LT 23181       | Hominini                                       |                       3.5 | Nachukui
+ KNM-LT 23182       | Hominini                                       |                       3.5 | Nachukui
+ KNM-LT 23183       | Hominini                                       |                       3.5 | Nachukui
+ KNM-WT 38333       | Hominini                                       |                       3.5 | Nachukui
+ KNM-LT 25936       | Hominini                                       |                       3.5 | Nachukui
+ OMO 20/1-1973-1886 | Australopithecus Dart, 1925                    |                       3.5 | Shungura
+ KNM-WT 38339       | Hominini                                       |                       3.5 | Nachukui
+ KNM-ER 2605        | Hominini                                       |                      3.45 | Koobi Fora
+ KNM-ER 2603        | Hominini                                       |                      3.45 | Koobi Fora
+ KNM-ER 2606        | Hominini                                       |                      3.45 | Koobi Fora
+ KNM-WT 8557        | Hominini                                       |                      3.41 | Nachukui
+ KNM-WT 16006       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38350       | Kenyanthropus platyops Leakey et al., 2001     |                       3.4 | Nachukui
+ KNM-WT 38352       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38357       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358c      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358d      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358e      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358f      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358g      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358h      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38358i      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38359a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38359b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361c      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361d      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361e      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361f      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361g      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361h      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38361i      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38362a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38362b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39949       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39950       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39951       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39952       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39953       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39954a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39954b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 39955       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 40001       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 66289       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 66290       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 66291       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38332       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38334       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38335       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38337       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38338       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38342       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38343a      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38343b      | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38345       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38346       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38347       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 38349       | Hominini                                       |                       3.4 | Nachukui
+ KNM-WT 16003       | Hominini                                       |                      3.36 | Nachukui
+ KNM-WT 8556b       | Hominini                                       |                      3.36 | Nachukui
+ KNM-WT 8556a       | Hominini                                       |                      3.36 | Nachukui
+ KNM-ER 2602g       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602f       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602e       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602d       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602c       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602b       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2602a       | Australopithecus Dart, 1925                    |                      3.35 | Koobi Fora
+ KNM-ER 2604        | Hominini                                       |                      3.35 | Koobi Fora
+ KNM-WT 38344       | Hominini                                       |                       3.3 | Nachukui
+ KNM-WT 38355       | Hominini                                       |                       3.3 | Nachukui
+ KNM-WT 38356       | Hominini                                       |                       3.3 | Nachukui
+ W 8-751            | Australopithecus Dart, 1925                    |                      3.21 | Usno
+ W 8-752            | Hominini                                       |                      3.21 | Usno
+ W 8-753            | Hominini                                       |                      3.21 | Usno
+ W 7-578            | Hominini                                       |                      3.21 | Usno
+ W 8-749            | Hominini                                       |                      3.21 | Usno
+ W 8-978            | Australopithecus Dart, 1925                    |                      3.21 | Usno
+ W 8-988            | Australopithecus Dart, 1925                    |                      3.21 | Usno
+ W 7-23             | Australopithecus Dart, 1925                    |                      3.21 | Usno
+ W 7-508            | Hominini                                       |                      3.21 | Usno
+ W 7-559i           | Hominini                                       |                      3.21 | Usno
+ W 8-750            | Australopithecus Dart, 1925                    |                      3.21 | Usno
+ OMO 20/4-1970-272  | Australopithecus Dart, 1925                    |                       3.1 | Shungura
+ B 8-4q             | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 8-27             | Hominini                                       |                      3.05 | Usno
+ B 8-23b            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 8-23a            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 7-39c            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 7-39b            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 8-20p            | Hominini                                       |                      3.05 | Usno
+ B 8-14b            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 8-14a            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 7-39a            | Australopithecus Dart, 1925                    |                      3.05 | Usno
+ B 8-28m            | Hominini                                       |                      3.05 | Usno
+(341 rows)
+
+ scientific_name |  n  
+-----------------+-----
+ Hominini        | 335
+(1 row)
+
+ preparations |  n  
+--------------+-----
+ Tooth        | 206
+ Postcranium  |  65
+ Cranium      |  52
+ Mandible     |  12
+(4 rows)
+
+
+
+Questions to answer:
+
+14. Write the SQL for Query 3 in plain English — describe what each clause (SELECT, FROM, JOIN, GROUP BY, ORDER BY) is doing and why it is needed.
+
+  - SELECT: Picks the output columns and shows the information for the formation plus a count.
+    FROM: Starts from fossils/specimens, and this is what we are counting
+    JOIN: Matches each fossil to a locality row. This is where the formation is found. 
+    GROUP BY: Groups or collapses all joined rows sharing the selected information so COUNT(*) counts within this group. 
+    ORDER BY: Orders the specimens in descending order. 
+
+15. Query 4 requires joining three tables. In plain English, describe the path from the fossils table to the scientific_name column and the formation column — which tables does the query have to visit, and how are they connected?
+
+  - The query starts at fossils. If follows fossils.taxon_id to taxa.taxon_id to get scientific_name. To get to formation, it follows fossils.locality_id to localities.locality_id. Both joins branch out from fossils to a single parent row, and each looks up a table: taxa and localities, and are never joined together, they are just connected through fossils. WHERE filters on the age of the fossils and it ORDER BY descending age. 
+
+
+

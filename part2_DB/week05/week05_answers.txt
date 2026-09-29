@@ -1,0 +1,540 @@
+Name: Jyhreh Johnson
+Date: 9/19/2026
+
+SUBMISSION
+
+GIT REPOSITORIES
+1. comp_paleo Repository
+
+https://github.com/jyhrehjohnson/comp_paleo.git
+
+
+2. Personal Research Project Repository
+
+https://github.com/jyhrehjohnson/MorphoDelim_Project_Directory.git
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+### PART 1 - GIT SETUP
+
+## 1.1 Configure your identity
+
+INPUT
+git config --global user.name "Jyhreh Johnson" 
+git config --global user.email "jyhrehj@utexas.edu"
+git config --global core.editor "nano"     # use nano as the default commit editor
+git config --global init.defaultBranch main  # use 'main' as the default branch name
+
+# Verify your settings
+git config --list
+
+OUTPUT
+usage: git config [<options>]
+
+Config file location
+    --global              use global config file
+    --system              use system config file
+    --local               use repository config file
+    --worktree            use per-worktree config file
+    -f, --file <file>     use given config file
+    --blob <blob-id>      read config from given blob object
+
+Action
+    --get                 get value: name [value-pattern]
+    --get-all             get all values: key [value-pattern]
+    --get-regexp          get values for regexp: name-regex [value-pattern]
+    --get-urlmatch        get value specific for the URL: section[.var] URL
+    --replace-all         replace all matching variables: name value [value-pattern]
+    --add                 add a new variable: name value
+    --unset               remove a variable: name [value-pattern]
+    --unset-all           remove all matches: name [value-pattern]
+    --rename-section      rename section: old-name new-name
+    --remove-section      remove a section: name
+    -l, --list            list all
+    --fixed-value         use string equality when comparing values to 'value-pattern'
+    -e, --edit            open an editor
+    --get-color           find the color configured: slot [default]
+    --get-colorbool       find the color setting: slot [stdout-is-tty]
+
+Type
+    -t, --type <type>     value is given this type
+    --bool                value is "true" or "false"
+    --int                 value is decimal number
+    --bool-or-int         value is --bool or --int
+    --bool-or-str         value is --bool or string
+    --path                value is a path (file or directory name)
+    --expiry-date         value is an expiry date
+
+Other
+    -z, --null            terminate values with NUL byte
+    --name-only           show variable names only
+    --includes            respect include directives on lookup
+    --show-origin         show origin of config (file, standard input, blob, command line)
+    --show-scope          show scope of config (worktree, local, global, system, command)
+    --default <value>     with --get, use default value when missing entry
+
+usage: git config [<options>]
+
+Config file location
+    --global              use global config file
+    --system              use system config file
+    --local               use repository config file
+    --worktree            use per-worktree config file
+    -f, --file <file>     use given config file
+    --blob <blob-id>      read config from given blob object
+
+Action
+    --get                 get value: name [value-pattern]
+    --get-all             get all values: key [value-pattern]
+    --get-regexp          get values for regexp: name-regex [value-pattern]
+    --get-urlmatch        get value specific for the URL: section[.var] URL
+    --replace-all         replace all matching variables: name value [value-pattern]
+    --add                 add a new variable: name value
+    --unset               remove a variable: name [value-pattern]
+    --unset-all           remove all matches: name [value-pattern]
+    --rename-section      rename section: old-name new-name
+    --remove-section      remove a section: name
+    -l, --list            list all
+    --fixed-value         use string equality when comparing values to 'value-pattern'
+    -e, --edit            open an editor
+    --get-color           find the color configured: slot [default]
+    --get-colorbool       find the color setting: slot [stdout-is-tty]
+
+Type
+    -t, --type <type>     value is given this type
+    --bool                value is "true" or "false"
+    --int                 value is decimal number
+    --bool-or-int         value is --bool or --int
+    --bool-or-str         value is --bool or string
+    --path                value is a path (file or directory name)
+    --expiry-date         value is an expiry date
+
+Other
+    -z, --null            terminate values with NUL byte
+    --name-only           show variable names only
+    --includes            respect include directives on lookup
+    --show-origin         show origin of config (file, standard input, blob, command line)
+    --show-scope          show scope of config (worktree, local, global, system, command)
+    --default <value>     with --get, use default value when missing entry
+
+zsh: command not found: #
+credential.helper=osxkeychain
+user.email=jyhrehj@utexas.edu
+user.name=Jyhreh Johnson
+core.autocrlf=input
+http.postbuffer=524288000
+
+
+## 1.2 Generate an SSH key and add it to GitHub
+
+INPUT
+ls -la ~/.ssh/
+
+OUTPUT
+drwx------   7 jyhrehjohnson  staff   224 Feb 26  2023 .
+drwxr-xr-x@ 74 jyhrehjohnson  staff  2368 Sep 18 13:26 ..
+-rw-------   1 jyhrehjohnson  staff   464 Feb 26  2023 id_ed25519
+-rw-r--r--   1 jyhrehjohnson  staff   106 Feb 26  2023 id_ed25519.pub
+-rw-------   1 jyhrehjohnson  staff  2655 Dec  2  2021 id_rsa
+-rw-r--r--   1 jyhrehjohnson  staff   608 Dec  2  2021 id_rsa.pub
+-rw-r--r--   1 jyhrehjohnson  staff   881 Dec  2  2021 known_hosts
+
+INPUT 
+ssh -T git@github.com
+
+OUTPUT
+Hi jyhrehjohnson! You've successfully authenticated, but GitHub does not provide shell access.
+
+
+QUESTIONS
+1. What is the difference between an SSH public key and a private key? Which one did you add to GitHub and why?
+  - A public key is shareable and can live on servers and connect to GitHub. A private key is a hidden key that is never uploaded or shared. It lives on your local server and is identifier when you connect to GitHub.
+
+2. Why must ~/.ssh/id_ed25519 have permissions 600 and not 644?
+  - This is our private key, so it needs permissions 600, as it means only I can access it, not a group of users. 
+
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
+### PART 2 - CORE GIT WORKFLOW
+
+## 2.1 Initialise a practice repository
+
+INPUT 
+git init
+
+OUTPUT
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint: 
+hint: 	git config --global init.defaultBranch <name>
+hint: 
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint: 
+hint: 	git branch -m <name>
+Initialized empty Git repository in /Users/jyhrehjohnson/git-practice/.git/
+
+INPUT
+git status
+
+OUTPUT
+On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+
+## 2.2 Your first commit
+
+INPUT
+echo "# Git Practice Repository" > README.md
+echo "Learning Git for research data management." >> README.md
+
+git status          # README.md appears as 'Untracked files'
+git add README.md
+git status          # README.md now appears under 'Changes to be committed'
+git commit -m "Add README with project description"
+git status          # clean working tree
+git log             # shows your first commit with hash, author, date, message
+
+OUTPUT
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   README.md
+
+[master (root-commit) b6388bc] Add README with project description
+ 1 file changed, 2 insertions(+)
+ create mode 100644 README.md
+On branch master
+nothing to commit, working tree clean
+fatal: ambiguous argument '#': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+
+## 2.3 Making more commits - meaningful messages
+
+INPUT
+git log
+
+OUTPUT
+commit b1303df8646826f3476881aabe92dddc64f82fad (HEAD -> master)
+Author: Jyhreh Johnson <jyhrehj@utexas.edu>
+Date:   Fri Sep 18 14:54:02 2026 -0500
+
+    Add usage section to README
+
+commit a2fb13e600899d0ba666f6c46a6abaa42009425f
+Author: Jyhreh Johnson <jyhrehj@utexas.edu>
+Date:   Fri Sep 18 14:53:52 2026 -0500
+
+    Add scripts directory structure
+
+commit c6961b6c931154336e572526db412541c8ebe84b
+Author: Jyhreh Johnson <jyhrehj@utexas.edu>
+Date:   Fri Sep 18 14:53:39 2026 -0500
+
+    Expand README with course context
+
+commit b6388bcef2d0f6ac415d62831d98f59a89cbfa3f
+Author: Jyhreh Johnson <jyhrehj@utexas.edu>
+Date:   Fri Sep 18 14:48:57 2026 -0500
+
+    Add README with project description
+
+INPUT
+git log --oneline
+
+OUTPUT
+b1303df (HEAD -> master) Add usage section to README
+a2fb13e Add scripts directory structure
+c6961b6 Expand README with course context
+b6388bc Add README with project description
+
+QUESTIONS
+3. What does git add actually do? What is the staging area for?
+  - git add tracks changes in a new file and copies the changes that need to be committed. The staging area organizes changes before they are committed.
+
+4. Look at your git log --oneline output. What is the 7-character string before each message? What is it called and what is it used for?
+
+OUTPUT
+b1303df (HEAD -> master) Add usage section to README
+a2fb13e Add scripts directory structure
+c6961b6 Expand README with course context
+b6388bc Add README with project description
+
+The 7-character strings before each message are abbreviated commit hashes, where each identifies a commit. 
+
+## 2.4 Inspecting changes
+INPUT
+echo "Author: $(whoami)" >> README.md
+
+git diff          
+git diff --staged   
+
+git add README.md
+git diff --staged   
+
+git commit -m 
+
+OUTPUT
+zsh: unknown file attribute:  
+zsh: number expected
+fatal: ambiguous argument '#': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+[master bec0396] Add author field to README
+ 1 file changed, 1 insertion(+)
+
+## 2.5 Undoing things
+
+INPUT
+git add README.md
+git restore --staged README.md  
+
+# Discard changes in the working directory (DESTRUCTIVE — cannot undo)
+echo "accidental change" >> README.md
+git restore README.md             
+
+# View a previous version of a file without checking it out
+git log --oneline                 
+git show <hash>:README.md 
+
+OUTPUT
+zsh: command not found: #
+error: pathspec '#' did not match any file(s) known to git
+error: pathspec 'removes' did not match any file(s) known to git
+error: pathspec 'from' did not match any file(s) known to git
+error: pathspec 'staging,' did not match any file(s) known to git
+error: pathspec 'keeps' did not match any file(s) known to git
+error: pathspec 'changes' did not match any file(s) known to git
+error: pathspec 'on' did not match any file(s) known to git
+error: pathspec 'disk' did not match any file(s) known to git
+zsh: unknown file attribute: C
+error: pathspec '#' did not match any file(s) known to git
+error: pathspec 'reverts' did not match any file(s) known to git
+error: pathspec 'file' did not match any file(s) known to git
+error: pathspec 'to' did not match any file(s) known to git
+error: pathspec 'last' did not match any file(s) known to git
+error: pathspec 'committed' did not match any file(s) known to git
+error: pathspec 'state' did not match any file(s) known to git
+zsh: command not found: #
+fatal: ambiguous argument '#': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+zsh: no such file or directory: hash
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+### PART 3 - REMOTE REPOSITORIES
+
+## Part 3.1 - Push to GitHub
+INPUT
+git remote add origin git@github.com:jyhrehjohnson/git-practice.git
+git remote -v           
+git push -u origin main  
+
+OUTPUT
+Enumerating objects: 16, done.
+Counting objects: 100% (16/16), done.
+Delta compression using up to 10 threads
+Compressing objects: 100% (12/12), done.
+Writing objects: 100% (16/16), 1.43 KiB | 1.43 MiB/s, done.
+Total 16 (delta 3), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (3/3), done.
+To github.com:jyhrehjohnson/git-practice.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+
+## 3.2 The push/pull cycle
+
+INPUT
+git log --oneline
+
+OUTPUT
+73d3829 (HEAD -> main, origin/main) Update README.md
+00f76f7 Note that remote repository is connected
+bec0396 Add author field to README
+b1303df Add usage section to README
+a2fb13e Add scripts directory structure
+c6961b6 Expand README with course context
+b6388bc Add README with project description
+
+
+QUESTIONS
+5. What does git remote add origin do? What is origin?
+  - git remote add adds a new Git repository as a shortname. Origin is the name of the shortcut. Together git remote add origin saves the named shortcut in my local repo that points to another copy of the repository.
+
+6. What is the difference between git fetch and git pull?
+  - git fetch fetches all the changes on the server. git pull is like get fetch, but it looks up what branch or server the current branch is tracking and get that from the server. 
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+### PART 4 - BRANCHING AND MERGING
+
+## 4.1 Create and use a branch
+INPUT
+git log --oneline --graph --all
+
+OUTPUT
+* de51996 (HEAD -> experiment) Document experimental results
+* 63e6576 Add experimental section to README
+* 73d3829 (origin/main, main) Update README.md
+* 00f76f7 Note that remote repository is connected
+* bec0396 Add author field to README
+* b1303df Add usage section to README
+* a2fb13e Add scripts directory structure
+* c6961b6 Expand README with course context
+* b6388bc Add README with project description
+
+## 4.2 Merge the branch
+INPUT
+cat README.md
+
+OUTPUT
+# Git Practice Repository
+Learning Git for research data management.
+Created for Week 5 of Informatics course.
+## Usage
+See scripts/ for shell script examples.
+Author: jyhrehjohnson
+accidental change
+Remote repository connected.
+
+Added line for section 3.2 The push/pull cycle
+
+INPUT 
+git merge experiment
+
+OUTPUT
+Updating 73d3829..de51996
+Fast-forward
+ README.md | 3 +++
+ 1 file changed, 3 insertions(+)
+
+INPUT 
+cat README.md
+
+OUTPUT
+# Git Practice Repository
+Learning Git for research data management.
+Created for Week 5 of Informatics course.
+## Usage
+See scripts/ for shell script examples.
+Author: jyhrehjohnson
+accidental change
+Remote repository connected.
+
+Added line for section 3.2 The push/pull cycle
+## Experimental Section
+Testing a new approach.
+Results were promising.
+
+INPUT
+git log --oneline --graph --all
+
+OUTPUT
+* de51996 (HEAD -> main, experiment) Document experimental results
+* 63e6576 Add experimental section to README
+* 73d3829 (origin/main) Update README.md
+* 00f76f7 Note that remote repository is connected
+* bec0396 Add author field to README
+* b1303df Add usage section to README
+* a2fb13e Add scripts directory structure
+* c6961b6 Expand README with course context
+* b6388bc Add README with project description
+
+INPUT
+git push
+
+OUTPUT
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Delta compression using up to 10 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (6/6), 667 bytes | 667.00 KiB/s, done.
+Total 6 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), completed with 1 local object.
+To github.com:jyhrehjohnson/git-practice.git
+   73d3829..de51996  main -> main
+
+## 4.3 Delete the branch
+
+INPUT
+git branch -d experiment
+
+OUTPUT
+Deleted branch experiment (was de51996).
+
+INPUT 
+git branch
+
+OUTPUT
+* main
+
+
+## 4.4 Simulate a merge conflict
+
+INPUT
+git log --oneline --graph --all
+
+OUTPUT
+*   7f19bb3 (HEAD -> main, origin/main) Resolve merge conflict: keep production title
+|\  
+| * 44e42fa Rename repository in README (experiment branch)
+* | ed91ca5 Rename repository in README (main branch)
+|/  
+* de51996 Document experimental results
+* 63e6576 Add experimental section to README
+* 73d3829 Update README.md
+* 00f76f7 Note that remote repository is connected
+* bec0396 Add author field to README
+* b1303df Add usage section to README
+* a2fb13e Add scripts directory structure
+* c6961b6 Expand README with course context
+* b6388bc Add README with project description
+
+QUESTIONS
+7. In the conflict markers, what does HEAD refer to?
+  - HEAD refers to the commit on the branch you are merging to
+
+8. When would you use a branch in your own research computing work? Give one concrete example from your research area.
+  - I can create a branch or branches to use different clustering methods without interrupting my current method pipeline. I could also use branches to adjust my current scripts if I wanted to add a different approach to my analysis. 
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+### PART 5 - .gitignore
+
+## 5.1  Create a .gitignore
+
+QUESTIONS
+9. Why should large data files be kept out of Git repositories? What should go in the repository instead?
+  - Large data files can slow down git commands, as the repo tries to save each revision of a data file 
+
+10. What is the difference between .gitignore ignoring a file and git rm --cached removing a file from tracking?
+  - .gitignore holds files that are being untracked, while git rm --cached still forces git not to track the file, but it is saved on your own hard drive
+
+

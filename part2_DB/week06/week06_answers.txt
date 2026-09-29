@@ -1,4 +1,9 @@
-Jyhreh Johnson
+Name: Jyhreh Johnson
+Date: 9/8/2026
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 
 ## PART 1 - THE PROBLEM WITH FLAT FILES
 
@@ -817,7 +822,6 @@ count
  Cranium      |  52
  Mandible     |  12
 (4 rows)
-
 
 
 Questions to answer:

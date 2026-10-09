@@ -1,0 +1,154 @@
+Jyhreh Johnson
+Week 07
+
+DESIGNING YOUR RESEARCH DATABASE
+
+## PART 4 - FIELD SPECIFICATIONS
+Questions to answer in week07_answers.txt:
+
+1. Identify one field in your design where you chose NOT NULL and explain why.
+
+  - One field I chose NOT NULL for was the source_id in "Observations." Every character and character state's information can be traced back to a publication or source. Different sources can score characters differently, so a source is essential for recording potential discrepancies.  
+
+2. Identify one field where you deliberately chose to allow NULL and explain what NULL means in that scientific context.
+
+  - A field where I allowed NULL is sex in "specimen". For most hominin fossils, sex is difficult to determine or is undetermined due to preservation or specimen ontogeny. 
+
+
+3. Are there any fields where you are storing a number as TEXT (or vice versa) for a specific reason? Justify the choice.
+
+  - Catalog numbers are stored as TEXT as they contain a combination of letters, hyphens, and numbers. 
+
+
+4. Does your design have any fields that store multiple values in one cell (e.g., a comma-separated list of species names)? If so, describe how you would restructure the schema to handle this correctly.
+
+  - Elements preserved under specimen. A single specimen can preserve multiple skeletal elements. For instance, a mandible will have multiple teeth within one element. 
+
+
+---
+
+## PART 5 — RELATIONSHIPS AND KEYS
+Questions to answer:
+
+5. For each table, did you choose a natural key or a surrogate key as the primary key? Justify each choice.
+
+  - Every table uses a surrogate key as the primary key. These ids are unique to the database for referencing and have no real-world meaning. 
+
+
+6. Does your design have any many-to-many relationships? If so, name the junction table and list its columns.
+
+  - There are three many-to-many relationships: specimen to characters, specimens to taxa, and characters to sources. The junction table would be taxon_assignments. 
+
+    assignment_id  INTEGER PRIMARY KEY
+    specimen_id    INTEGER NOT NULL  -> specimen.specimen_id
+    taxon_id       INTEGER NOT NULL  -> taxon.taxon_id
+    source_id      INTEGER NOT NULL  -> source.source_id
+
+
+7. Compare your key choices with those made in the OTB schema (catalog_number as a natural TEXT key for fossils; SERIAL integers for taxa and localities). Are your choices consistent with the OTB approach? Where do they differ and why?
+
+  - My choices are similar to the OTB schema for taxa and localities, with both using INTEGER keys. Our specimen tables differ, as the OTB schema has catalog_number TEXT as the primary key for fossils, but my database uses a surrogate specimen_id as the primary key and makes the catalog_number its own unique field. This is because my database draws from specimens across multiple countries that are held in multiple institutions with different cataloging methods. Having a specimen_id as the primary key makes it easier to identify the specimen being referenced. 
+
+---
+
+## PART 7 - PRELIMINARY SCHEMA
+Questions to answer:
+
+8. Did you encounter any SQL reserved words in your field names? List any you had to rename and what you renamed them to.
+
+  - I had to rename rank to taxon_rank and year to pub_year. Both are reserved words in SQL standards. 
+
+9. Choose one table from your schema and explain why each field has the data type you chose.
+
+  - Table: characters
+
+	character_id INTEGER: surrogate primary key. SQLite assigns an INTEGER PRIMARY KEY automatically, and other tables			(character_state, observation) reference it with a single whole number.
+ 	
+	character_name TEXT: a short name such as "sagittal crest". Names vary in length and are words, not quantities.
+ 	
+	character_description TEXT: the full definition as published, which can run to several sentences. TEXT has no length limit 		in SQLite.
+ 	
+	anatomical_region TEXT: a controlled-vocabulary label (cranial vault, face, mandible, dentition, postcranial). It names a 		category, so it is text, not a number code.
+ 	
+	character_type TEXT: a controlled-vocabulary label (binary, multistate, continuous). Stored as words rather than codes 			such as 1/2/3 so that queries and output are readable without a key.
+ 
+	is_ordered INTEGER: a yes/no value. SQLite has no BOOLEAN type, so it is stored as 0 or 1, which can be filtered and 			counted directly. It is left NULL when ordering does not apply (binary and continuous characters).
+ 
+	units TEXT: the unit of measurement for continuous characters (mm, degrees, index). A unit is a label, not a quantity; my 		first draft had this as NUMERIC, which was a mistake.
+ 
+	measurement_protocol TEXT: a free-text description of how the measurement is taken, often citing landmarks.
+
+	source_id INTEGER: a foreign key, so it must have the same type as
+
+10. If you run your schema and then try to insert a row with a NULL value in a NOT NULL field, what error do you get? Demonstrate this with a test INSERT and paste the error message.
+
+	INPUT 
+	sqlite3 test.db < schema_draft.sql
+	sqlite3 test.db ".tables"         
+
+	OUTPUT
+	character    character_state    locality    observation    source    specimen    taxon    taxon_assignment
+
+	INPUT
+	sqlite3 test.db "INSERT INTO specimen (catalog_number, locality_id) VALUES (NULL, NULL);"
+
+	OUTPUT
+	Error in 2nd command line argument: NOT NULL constraint failed: specimen.catalog_number
+
+
+--- 
+
+## PART 8 - DESIGN REFLECTION
+
+On table structure (Ch 5)
+
+11. The textbook describes several characteristics of a well-designed table: it represents a single subject, it has a primary key, it has no redundant data, and it has no multi-value fields. Evaluate one of your tables against each of these criteria.
+
+  - Table: observations
+
+	Single subject: yes. Each row is one scoring of one character by one source. Nothing about the specimen or the character is stored here.
+ 	Primary key: yes, observation_id.
+ 	No redundant data: mostly. character_id is probably redundant, since a state already belongs to one character. I kept it because measurements and missing scores have no state, so without character_id those rows would not say which character they belong to.
+  	A composite foreign key on (character_id, state_id) prevents the two from contradicting each other.
+ 	No multi-value fields: yes. Each row holds one state, one measurement, or one missing reason, and a CHECK constraint enforces exactly one of the three.
+
+
+12. Did you include any lookup tables (tables that store only a controlled vocabulary, like a list of habitat types or element names)? If not, how are you handling controlled vocabularies? If yes, is a separate lookup table the right design for your dataset size and use case?
+
+  - I did not include lookup tables for controlled vocabulary. These are stored as TEXT fields and should be listed. 
+
+On keys (Ch 6)
+
+13. The textbook distinguishes between a candidate key (any column or combination that could uniquely identify rows) and the primary key (the one you chose). For your most important table, identify all candidate keys and explain why you chose one over the others.
+
+  - My most important table is the characters table. character_id is the only candidate key, and it also serves as the primary key. The character_id unique column. 
+
+14. The textbook warns against using fields that might change over time as primary keys. Review your natural key choices — could any of them change? (Common examples: specimen catalog numbers that get reassigned, species names that change with taxonomic revision, GPS coordinates that are remeasured.) What is your mitigation strategy?
+
+  - Catalog numbers, taxon names, and locality coordinates could change. My mitigation strategy is to not use these as primary keys. 
+
+On field specifications (Ch 7)
+
+15. The textbook recommends giving each field a complete specification including a description of what it stores, not just a name and type. Choose three fields from your schema and write a full specification for each, following the textbook format: field name, data type, required, description, example value.
+
+  - 	Field name:  catalog_number (table: specimen)
+	Data type:   TEXT
+	Required:    Yes (NOT NULL, UNIQUE)
+	Description: The catalog number assigned to the physical specimen by discovery publication.
+	Example:     Sts 5
+ 
+	Field name:  anatomical_region (table: characters)
+	Data type:   TEXT
+	Required:    No
+	Description: The anatomical region where the character exists. 
+	Example:     Dental
+ 
+	Field name:  is_ordered (table: characters)
+	Data type:   INTEGER
+	Required:    No
+	Description: Whether the states of a multistate character are treated as ordered (1) or unordered (0) in phylogenetic analysis. 
+	Example:     1
+
+16. The OTB database stores verbatim_chronometric_age (the age as written in the source publication) alongside earliest_chronometric_age and latest_chronometric_age (parsed numeric values). This preserves both the original observation and the structured data derived from it. Does your design have any fields where this pattern would be appropriate? Identify them and explain.
+
+  - I could use this in my localities table and potentially in the character_description field. For the localities table, I would follow the OTB database and for the character_description field I could track source descriptions. 

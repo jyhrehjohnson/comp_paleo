@@ -71,9 +71,7 @@ CREATE TABLE character_state (
     state_id           INTEGER PRIMARY KEY,
     character_id       INTEGER NOT NULL REFERENCES character(character_id),
     state_code         INTEGER NOT NULL,
-    state_description  TEXT NOT NULL,
-    UNIQUE (character_id, state_code),
-    UNIQUE (character_id, state_id)     -- target of the composite FK in observation
+    state_description  TEXT NOT NULL
 );
 
 -- One score of one character on one specimen, as reported by one source

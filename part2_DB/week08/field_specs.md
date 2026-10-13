@@ -104,3 +104,4 @@
 | citation | TEXT | — | YES | NO | — |       —                         | Every source must have a citation to be identifiable |
 | pub_year | INTEGER | — | NO | NO | — | `pub_year BETWEEN 1800 AND 2100` | NULL if unpublished or in press |
 | doi | TEXT | — | NO | YES | — | —              | Natural candidate key when present; NULL if the source has no DOI; every DOI begins with 10. |
+

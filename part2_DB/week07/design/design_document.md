@@ -196,13 +196,6 @@ Paleoanthropologists will use the database for research on taxonomy, taphonomy, 
 | Many specimens ↔ many taxa		 | ∞:∞	       | Junction table taxon_assignment with specimen_id --> taxon_id	|
 
 
----
-
-## Key Choices
-
-[Paragraph discussing natural vs surrogate key choices for each table,
-and any many-to-many relationships and their junction tables]
-
 
 
 

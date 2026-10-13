@@ -9,7 +9,7 @@ CREATE TABLE source (
     source_id   INTEGER PRIMARY KEY,
     citation    TEXT NOT NULL,
     pub_year    INTEGER,            -- 'year' avoided; reserved in some SQL dialects
-    doi         TEXT UNIQUE
+    doi         TEXT 
 );
 
 -- Places where specimens were found, with stratigraphic and age context
@@ -41,8 +41,7 @@ CREATE TABLE taxon (
     rank              TEXT NOT NULL, -- 'rank' avoided; reserved in some SQL dialects
     named_by          TEXT,
     year_named        INTEGER,
-    type_specimen_id  INTEGER REFERENCES specimen(specimen_id),
-    UNIQUE (genus, species)
+    type_specimen_id  INTEGER REFERENCES specimen(specimen_id)
 );
 
 -- Junction table: which source assigns which specimen to which taxon
@@ -50,8 +49,7 @@ CREATE TABLE taxon_assignment (
     assignment_id  INTEGER PRIMARY KEY,
     specimen_id    INTEGER NOT NULL REFERENCES specimen(specimen_id),
     taxon_id       INTEGER NOT NULL REFERENCES taxon(taxon_id),
-    source_id      INTEGER NOT NULL REFERENCES source(source_id),
-    UNIQUE (specimen_id, taxon_id, source_id)
+    source_id      INTEGER NOT NULL REFERENCES source(source_id)
 );
 
 -- Morphological characters as defined in the literature
@@ -71,9 +69,7 @@ CREATE TABLE character_state (
     state_id           INTEGER PRIMARY KEY,
     character_id       INTEGER NOT NULL REFERENCES character(character_id),
     state_code         INTEGER NOT NULL,
-    state_description  TEXT NOT NULL,
-    UNIQUE (character_id, state_code),
-    UNIQUE (character_id, state_id)     -- target of the composite FK in observation
+    state_description  TEXT NOT NULL
 );
 
 -- One score of one character on one specimen, as reported by one source

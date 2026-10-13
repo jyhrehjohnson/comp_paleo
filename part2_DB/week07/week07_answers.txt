@@ -58,6 +58,7 @@ Questions to answer:
 
   - I had to rename rank to taxon_rank and year to pub_year. Both are reserved words in SQL standards. 
 
+
 9. Choose one table from your schema and explain why each field has the data type you chose.
 
   - Table: characters
@@ -66,15 +67,15 @@ Questions to answer:
  	
 	character_name TEXT: a short name such as "sagittal crest". Names vary in length and are words, not quantities.
  	
-	character_description TEXT: the full definition as published, which can run to several sentences. TEXT has no length limit 		in SQLite.
+	character_description TEXT: the full definition as published, which can run to several sentences. TEXT has no length limit in SQLite.
  	
-	anatomical_region TEXT: a controlled-vocabulary label (cranial vault, face, mandible, dentition, postcranial). It names a 		category, so it is text, not a number code.
+	anatomical_region TEXT: a controlled-vocabulary label (cranial vault, face, mandible, dentition, postcranial). It names a category, so it is text, not a number code.
  	
-	character_type TEXT: a controlled-vocabulary label (binary, multistate, continuous). Stored as words rather than codes 			such as 1/2/3 so that queries and output are readable without a key.
+	character_type TEXT: a controlled-vocabulary label (binary, multistate, continuous). Stored as words rather than codes such as 1/2/3 so that queries and output are readable without a key.
  
-	is_ordered INTEGER: a yes/no value. SQLite has no BOOLEAN type, so it is stored as 0 or 1, which can be filtered and 			counted directly. It is left NULL when ordering does not apply (binary and continuous characters).
+	is_ordered INTEGER: a yes/no value. SQLite has no BOOLEAN type, so it is stored as 0 or 1, which can be filtered and counted directly. It is left NULL when ordering does not apply (binary and continuous characters).
  
-	units TEXT: the unit of measurement for continuous characters (mm, degrees, index). A unit is a label, not a quantity; my 		first draft had this as NUMERIC, which was a mistake.
+	units TEXT: the unit of measurement for continuous characters (mm, degrees, index). A unit is a label, not a quantity; my first draft had this as NUMERIC, which was a mistake.
  
 	measurement_protocol TEXT: a free-text description of how the measurement is taken, often citing landmarks.
 

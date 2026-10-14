@@ -24,7 +24,7 @@ CREATE TABLE characters (
     character_id           INTEGER PRIMARY KEY,
 
     -- Required fields
-    character_description  TEXT    NOT NULL,            -- the only human-readable identifier
+    character_description  TEXT    NOT NULL,
 
     -- Optional fields
     is_ordered             INTEGER                      -- NULL permitted: not applicable / not stated
@@ -33,7 +33,7 @@ CREATE TABLE characters (
 
     -- Controlled vocabulary
     character_type         TEXT    NOT NULL
-                           CHECK (character_type IN ('discrete', 'continuous')),
+                           CHECK (character_type IN ('multistate', 'discrete', 'continuous')),
     anatomical_region      TEXT
                            CHECK (anatomical_region IN ('Cranial', 'Craniofacial', 'Dental', 'Postcranial')),
     units                  TEXT
@@ -61,13 +61,13 @@ CREATE TABLE character_states (
 
     -- Required fields
     state_code         INTEGER NOT NULL
-                       CHECK (state_code BETWEEN 0 AND 9),  -- single-digit matrix coding
+                       CHECK (state_code BETWEEN 0 AND 9),
     state_description  TEXT    NOT NULL,
 
     -- Foreign keys
     character_id       INTEGER NOT NULL
                        REFERENCES characters(character_id)
-                       ON DELETE CASCADE                 -- states are part of their character
+                       ON DELETE CASCADE
                        ON UPDATE CASCADE,
 
      UNIQUE (character_id, state_code),
@@ -86,17 +86,17 @@ CREATE TABLE fossil_specimens (
     catalog_number      TEXT    NOT NULL UNIQUE,
 
     -- Optional fields
-    elements_preserved  TEXT,                           -- verbatim description from the source
+    elements_preserved  TEXT,
     notes               TEXT,
 
     -- Controlled vocabulary
     ontogenetic_stage   TEXT                            -- NULL permitted: indeterminate
                         CHECK (ontogenetic_stage IN ('infant', 'juvenile', 'subadult', 'adult')),
-    sex                 TEXT                            -- NULL permitted: indeterminate, the usual case
+    sex                 TEXT                            -- NULL permitted: indeterminate
                         CHECK (sex IN ('female', 'male')),
 
     -- Foreign keys
-    locality_id         INTEGER                         -- NULL permitted: provenience unknown
+    locality_id         INTEGER                         -- NULL permitted: area unknown
                         REFERENCES localities(locality_id)
                         ON DELETE RESTRICT
                         ON UPDATE CASCADE
@@ -114,13 +114,13 @@ CREATE TABLE taxa (
 
     -- Optional fields
     species           TEXT                              -- NULL for genus-rank taxa
-                      CHECK (species = lower(species)), -- epithets are lower case
+                      CHECK (species = lower(species)),
     named_by          TEXT,
-    year_named        INTEGER                           -- 1758 = start of zoological nomenclature
+    year_named        INTEGER
                       CHECK (year_named BETWEEN 1758 AND 2100),
 
     -- Controlled vocabulary
-    taxon_rank        TEXT    NOT NULL                  -- 'rank' is reserved in some dialects
+    taxon_rank        TEXT    NOT NULL
                       CHECK (taxon_rank IN ('genus', 'species')),
 
     -- Foreign keys
@@ -143,11 +143,11 @@ CREATE TABLE taxon_assignments (
     -- Foreign keys
     specimen_id    INTEGER NOT NULL
                    REFERENCES fossil_specimens(specimen_id)
-                   ON DELETE CASCADE                    -- link has no meaning without the specimen
+                   ON DELETE CASCADE
                    ON UPDATE CASCADE,
     taxon_id       INTEGER NOT NULL
                    REFERENCES taxa(taxon_id)
-                   ON DELETE RESTRICT                   -- do not erase published assignments
+                   ON DELETE RESTRICT
                    ON UPDATE CASCADE,
     source_id      INTEGER NOT NULL
                    REFERENCES sources(source_id)
@@ -169,7 +169,7 @@ CREATE TABLE localities (
     country          TEXT,                              -- NULL permitted: not yet entered
     formation        TEXT,                              -- NULL permitted: many cave sites have no formal formation
     member           TEXT,                              -- NULL permitted: no member assigned
-    verbatim_age     TEXT,                              -- age exactly as written in the source
+    verbatim_age     TEXT,
     earliest_age_ma  NUMERIC CHECK (earliest_age_ma > 0),
     latest_age_ma    NUMERIC CHECK (latest_age_ma >= 0),
 
@@ -200,13 +200,13 @@ CREATE TABLE observations (
     -- Foreign keys
     specimen_id     INTEGER NOT NULL
                     REFERENCES fossil_specimens(specimen_id)
-                    ON DELETE CASCADE                    -- a score has no meaning without its specimen
+                    ON DELETE CASCADE
                     ON UPDATE CASCADE,
     character_id    INTEGER NOT NULL
                     REFERENCES characters(character_id)
                     ON DELETE RESTRICT
                     ON UPDATE CASCADE,
-    state_id        INTEGER,                             -- discrete characters only
+    state_id        INTEGER,
     source_id       INTEGER NOT NULL
                     REFERENCES sources(source_id)
                     ON DELETE RESTRICT

@@ -16,7 +16,7 @@ Key field(s): state_id
 Key type: Surrogate
 
 Justification:
-Character states naturally do not have a unique identifier. They are identified by their character and state code. The state_id creates an identifier for the database and is attached to each character state for reference. 
+Character states don't have a unique identifier. They are identified by their character and state code. The state_id creates an identifier for the database and is attached to each character state for reference. 
 
 ### Table: fossil_specimens
 
@@ -49,7 +49,7 @@ Key field(s): assignment_id
 Key type: Surrogate
 
 Justification:
-Taxonomic assignments can change the same as taxa through taxonomic revisions. You can utilize this key to identify where sources differ in their assignments. 
+Taxonomic assignments can change the same as taxa through taxonomic revisions. I can utilize this key to identify where sources differ in their assignments. 
 
 ### Table: localities
 
@@ -65,7 +65,7 @@ Key field(s): observation_id
 Key type: Surrogate
 
 Justification:
-An observation records an event (one source scoring one character on one specimen), so it has no natural identifier. A surrogate key guarantees unique for every row.
+An observation records an event (one source scoring one character on one specimen), so it has no natural identifier. A surrogate key guarantees unique value for every row.
 
 ### Table: sources
 
@@ -73,5 +73,5 @@ Key field(s): source_id
 Key type: Surrogate
 
 Justification:
-A DOI is the most citable identifier for a publication, but much of the hominin literature predates DOIs. The source_id creates a unique identifier for all publications. 
+A DOI is the identifier for a publication, but much of the hominin literature don't have DOIs. The source_id creates a unique identifier for all publications. 
 

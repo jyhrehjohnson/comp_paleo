@@ -1,6 +1,6 @@
 -- ============================================================================
 -- constraint_tests.sql
--- Hominin Character State Database — Constraint Tests (Week08)
+-- Hominin Character State Database — Constraint Tests (week08)
 -- Author: Jyhreh Johnson
 -- ============================================================================
 
@@ -9,25 +9,24 @@ sqlite3 myresearch.db < constraint_tests.sql
    echo "Exit code: 0"
 
 OUTPUT
-Error near line 41: NOT NULL constraint failed: fossil_specimens.catalog_number
-Error near line 53: NOT NULL constraint failed: characters.character_description
-Error near line 65: UNIQUE constraint failed: fossil_specimens.catalog_number
-Error near line 77: UNIQUE constraint failed: sources.doi
-Error near line 89: CHECK constraint failed: character_type IN ('discrete', 'continuous')
-Error near line 101: CHECK constraint failed: dating_method IN ('Ar-Ar', 'K-Ar', 'U-Pb', 'U-series',
+Error near line 32: NOT NULL constraint failed: fossil_specimens.catalog_number
+Error near line 44: NOT NULL constraint failed: characters.character_description
+Error near line 56: UNIQUE constraint failed: fossil_specimens.catalog_number
+Error near line 68: UNIQUE constraint failed: sources.doi
+Error near line 80: CHECK constraint failed: character_type IN ('multistate', 'discrete', 'continuous')
+Error near line 92: CHECK constraint failed: dating_method IN ('Ar-Ar', 'K-Ar', 'U-Pb', 'U-series',
                                               'ESR', 'biochronology')
-Error near line 113: CHECK constraint failed: ontogenetic_stage IN ('infant', 'juvenile', 'subadult', 'adult')
-Error near line 128: CHECK constraint failed: year_named BETWEEN 1758 AND 2100
-Error near line 143: CHECK constraint failed: state_code BETWEEN 0 AND 9
-Error near line 154: CHECK constraint failed: character_type = 'continuous' OR units IS NULL
-Parse error near line 162: foreign key mismatch - "observations" referencing "character_states"
-Parse error near line 167: foreign key mismatch - "observations" referencing "character_states"
+Error near line 104: CHECK constraint failed: ontogenetic_stage IN ('infant', 'juvenile', 'subadult', 'adult')
+Error near line 119: CHECK constraint failed: year_named BETWEEN 1758 AND 2100
+Error near line 134: CHECK constraint failed: state_code BETWEEN 0 AND 9
+Error near line 145: CHECK constraint failed: character_type = 'continuous' OR units IS NULL
+Error near line 158: FOREIGN KEY constraint failed
 ╭──────────────────────╮
 │ locality_2_rows_r... │
 ╞══════════════════════╡
 │                    0 │
 ╰──────────────────────╯
-Error near line 185: FOREIGN KEY constraint failed
+Error near line 176: FOREIGN KEY constraint failed
 ╭──────────────────────╮
 │ locality_1_rows_r... │
 ╞══════════════════════╡
@@ -38,7 +37,7 @@ Error near line 185: FOREIGN KEY constraint failed
 ╞══════════════════════╡
 │                    0 │
 ╰──────────────────────╯
-Error near line 197: FOREIGN KEY constraint failed
+Error near line 188: FOREIGN KEY constraint failed
 ╭──────────────────────╮
 │ source_1_rows_rem... │
 ╞══════════════════════╡
@@ -49,32 +48,29 @@ Error near line 197: FOREIGN KEY constraint failed
 ╞══════════╪══════════════╪══════════╪══════════════════╡
 │        2 │ Paranthropus │ robustus │                3 │
 ╰──────────┴──────────────┴──────────┴──────────────────╯
-Parse error near line 208: foreign key mismatch - "observations" referencing "character_states"
 ╭──────────┬──────────────┬──────────┬──────────────────╮
 │ taxon_id │    genus     │ species  │ type_specimen_id │
 ╞══════════╪══════════════╪══════════╪══════════════════╡
-│        2 │ Paranthropus │ robustus │                3 │
+│        2 │ Paranthropus │ robustus │ NULL             │
 ╰──────────┴──────────────┴──────────┴──────────────────╯
 ╭─────────────────────┬────────────────────╮
 │ observations_before │ assignments_before │
 ╞═════════════════════╪════════════════════╡
-│                   0 │                  1 │
+│                   1 │                  1 │
 ╰─────────────────────┴────────────────────╯
-Parse error near line 220: foreign key mismatch - "observations" referencing "character_states"
 ╭────────────────────┬───────────────────╮
 │ observations_after │ assignments_after │
 ╞════════════════════╪═══════════════════╡
-│                  0 │                 1 │
+│                  0 │                 0 │
 ╰────────────────────┴───────────────────╯
 ╭───────────────╮
 │ states_before │
 ╞═══════════════╡
 │             2 │
 ╰───────────────╯
-Parse error near line 233: foreign key mismatch - "observations" referencing "character_states"
 ╭──────────────╮
 │ states_after │
 ╞══════════════╡
-│            2 │
+│            0 │
 ╰──────────────╯
 Exit code: 0

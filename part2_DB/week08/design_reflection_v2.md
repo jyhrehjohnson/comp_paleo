@@ -6,7 +6,6 @@
 
 The most significant changes from the week07 draft is that I created new a new table (type_speciemens) and adjusted fields in localities table. While working through everything the database needed I realized that I also needed to record the type specimen for each taxa. The type specimen is an important component for the theorectical and methodological portions of my dissertation making their character information highly important. As stated in my week07_answers.txt I chose to to follow the OTB database and adopt the `verbatim_chronometric_age`, `earliest_chronometric_age`, and `latest_chronometric_age` for my localities table. 
 
-
 ## Which constraint was hardest to specify?
 
 The rule that a taxon name appears only once was more difficult than I thought it would be. My first version was `UNIQUE (genus, species)`. Constraint testing showed it would accept two genus-rank rows for *Paranthropus*, because species is NULL for genus-rank taxa and SQL treats two NULLs as distinct. I considered storing an empty string instead of NULL, if I did this I would lose the ability to query by genus. The solution was a unique index on `(genus, coalesce(species, ''))`, which treats a missing epithet as one shared value. A CHECK then ties `species` to `taxon_rank`.

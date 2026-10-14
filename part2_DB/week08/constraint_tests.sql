@@ -6,7 +6,6 @@
 
 PRAGMA foreign_keys = ON;   -- must be set on every new connection in SQLite
 
-
 -- ── Setup: parent rows used by later tests ──────────────────────────────────
 
 INSERT INTO sources (source_id, citation, pub_year, doi)

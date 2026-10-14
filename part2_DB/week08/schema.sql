@@ -8,14 +8,14 @@
 PRAGMA foreign_keys = ON;
 
 -- Drop in reverse dependency order (children before parents)
-DROP TABLE IF EXISTS sources;
 DROP TABLE IF EXISTS observations;
-DROP TABLE IF EXISTS localities;
 DROP TABLE IF EXISTS taxon_assignments;
 DROP TABLE IF EXISTS taxa;
-DROP TABLE IF EXISTS fossil_specimens;
 DROP TABLE IF EXISTS character_states;
 DROP TABLE IF EXISTS characters;
+DROP TABLE IF EXISTS fossil_specimens;
+DROP TABLE IF EXISTS localities;
+DROP TABLE IF EXISTS sources;
 
 -- ── characters ───────────────────────────────────────────────────────────────
 -- A morphological character as defined in the literature.

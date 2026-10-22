@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>{% block title %}Hominin Characters Database{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-$END$
+<nav>
+    <a class="brand" href="{{ url_for('index') }}">Hominin Characters</a>
+    <a href="{{ url_for('list_sources') }}">Sources</a>
+    <a href="{{ url_for('list_characters') }}">Characters</a>
+    <a href="{{ url_for('list_states') }}">Character States</a>
+</nav>
+<main>
+    {% block content %}{% endblock %}
+</main>
 </body>
 </html>

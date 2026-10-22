@@ -1,0 +1,74 @@
+/* topic3_style.css — styles for topic3_primer.html */
+
+body {
+    font-family: "Times New Roman", serif;
+    background-color: #f7f4ee;
+    color: #2b2218;
+    margin: 0;
+}
+
+nav {
+    background-color: #BF5700;
+    padding: 0.75rem 2rem;
+}
+
+nav a {
+    color: #e9e4d6;
+    text-decoration: none;
+    margin-right: 1.5rem;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    max-width: 900px;
+    padding: 1rem 2rem 3rem;
+}
+
+h1 {
+    color: #BF5700;
+    border-bottom: 2px solid #b8a47e;
+    padding-bottom: 0.3rem;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+th, td {
+    border: 1px solid #d6cfc0;
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #e6dfcf;
+}
+
+form label {
+    display: block;
+    margin-bottom: 0.9rem;
+}
+
+form input, form select {
+    display: block;
+    margin-top: 0.25rem;
+    padding: 0.35rem;
+    width: 100%;
+    max-width: 420px;
+    font: inherit;
+}
+
+button {
+    background-color: #BF5700;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    font: inherit;
+    cursor: pointer;
+}

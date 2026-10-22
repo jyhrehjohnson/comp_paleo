@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Sources — Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Sources</h1>
+<a class="add" href="{{ url_for('new_source') }}">+ Add source</a>
+<table>
+    <thead>
+        <tr><th>ID</th><th>Citation</th><th>Year</th><th>DOI</th><th>Characters</th></tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row['source_id'] }}</td>
+            <td>{{ row['citation'] }}</td>
+            <td>{{ row['pub_year'] or '—' }}</td>
+            <td>{{ row['doi'] or '—' }}</td>
+            <td>{{ row['n_characters'] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No sources yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

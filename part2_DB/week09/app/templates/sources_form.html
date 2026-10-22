@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}New source — Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Add a source</h1>
+
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form method="post">
+    <label>Citation
+        <input type="text" name="citation" value="{{ form.get('citation', '') }}" required>
+    </label>
+    <label>Publication year (optional)
+        <input type="number" name="pub_year" value="{{ form.get('pub_year', '') }}">
+    </label>
+    <label>DOI (optional)
+        <input type="text" name="doi" value="{{ form.get('doi', '') }}">
+    </label>
+    <button type="submit">Save source</button>
+    <a class="cancel" href="{{ url_for('list_sources') }}">Cancel</a>
+</form>
+{% endblock %}

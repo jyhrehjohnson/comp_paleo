@@ -1,10 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Character states — Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Character states</h1>
+<a class="add" href="{{ url_for('new_state') }}">+ Add state</a>
+<table>
+    <thead>
+        <tr><th>State ID</th><th>Character</th><th>Code</th><th>State</th></tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row['state_id'] }}</td>
+            <td>{{ row['character_description'] }}</td>
+            <td>{{ row['state_code'] }}</td>
+            <td>{{ row['state_description'] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No character states yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

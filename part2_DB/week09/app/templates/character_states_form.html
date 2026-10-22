@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}New state — Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Add a character state</h1>
+
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form method="post">
+    <label>Character
+        <select name="character_id" required>
+            <option value="">— choose a character —</option>
+            {% for c in characters %}
+            <option value="{{ c['character_id'] }}"
+                {% if form.get('character_id') == c['character_id']|string %}selected{% endif %}>
+                {{ c['character_description'] }}
+            </option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>State code (0–9)
+        <input type="number" name="state_code" value="{{ form.get('state_code', '') }}" required>
+    </label>
+
+    <label>State description
+        <input type="text" name="state_description"
+               value="{{ form.get('state_description', '') }}" required>
+    </label>
+
+    <button type="submit">Save state</button>
+    <a class="cancel" href="{{ url_for('list_states') }}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,10 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}New character — Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Add a character</h1>
+
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form method="post">
+    <label>Character description
+        <input type="text" name="character_description"
+               value="{{ form.get('character_description', '') }}" required>
+    </label>
+
+    <label>Character type
+        <select name="character_type" required>
+            <option value="">— choose —</option>
+            {% for t in character_types %}
+            <option value="{{ t }}" {% if form.get('character_type') == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Ordered (multistate characters only)
+        <select name="is_ordered">
+            <option value="">— not applicable —</option>
+            <option value="1" {% if form.get('is_ordered') == '1' %}selected{% endif %}>Ordered</option>
+            <option value="0" {% if form.get('is_ordered') == '0' %}selected{% endif %}>Unordered</option>
+        </select>
+    </label>
+
+    <label>Anatomical region
+        <select name="anatomical_region">
+            <option value="">— none —</option>
+            {% for r in regions %}
+            <option value="{{ r }}" {% if form.get('anatomical_region') == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Units (continuous characters only)
+        <select name="units">
+            <option value="">— none —</option>
+            {% for u in units %}
+            <option value="{{ u }}" {% if form.get('units') == u %}selected{% endif %}>{{ u }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Measurement protocol (optional)
+        <textarea name="measurement_protocol" rows="3">{{ form.get('measurement_protocol', '') }}</textarea>
+    </label>
+
+    <label>Source
+        <select name="source_id" required>
+            <option value="">— choose a source —</option>
+            {% for s in sources %}
+            <option value="{{ s['source_id'] }}"
+                {% if form.get('source_id') == s['source_id']|string %}selected{% endif %}>
+                {{ s['citation'] }}
+            </option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <button type="submit">Save character</button>
+    <a class="cancel" href="{{ url_for('list_characters') }}">Cancel</a>
+</form>
+{% endblock %}

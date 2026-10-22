@@ -1,10 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Hominin Characters</title>
+    <link rel="stylesheet" href="topic3_style.css">
 </head>
 <body>
-$END$
+
+<nav>
+    <a href="#">Sources</a>
+    <a href="#">Characters</a>
+    <a href="#">States</a>
+</nav>
+
+<h1>Hominin Characters</h1>
+
+<h2>Characters</h2>
+<table>
+    <tr><th>Character</th><th>Type</th><th>Region</th></tr>
+    <tr><td>Anterior pillars</td><td>discrete</td><td>Craniofacial</td></tr>
+    <tr><td>Incisal reduction</td><td>multistate</td><td>Dental</td></tr>
+    <tr><td>Cranial capacity</td><td>continuous</td><td>Cranial</td></tr>
+</table>
+
+<h2>Add a character</h2>
+<form method="post">
+    <label>Description <input type="text" name="character_description" required></label>
+    <label>Type
+        <select name="character_type">
+            <option value="discrete">discrete</option>
+            <option value="multistate">multistate</option>
+            <option value="continuous">continuous</option>
+        </select>
+    </label>
+    <label>Protocol <input type="text" name="measurement_protocol"></label>
+    <button type="submit">Save</button>
+</form>
+
 </body>
 </html>

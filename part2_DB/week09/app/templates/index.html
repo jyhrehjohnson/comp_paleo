@@ -1,10 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Hominin Characters Database{% endblock %}
+{% block content %}
+<h1>Hominin Character State Database</h1>
+
+<div class="cards">
+    <a class="card" href="{{ url_for('list_sources') }}">
+        <span class="count">{{ n_sources }}</span> sources
+    </a>
+    <a class="card" href="{{ url_for('list_characters') }}">
+        <span class="count">{{ n_characters }}</span> characters
+    </a>
+    <a class="card" href="{{ url_for('list_states') }}">
+        <span class="count">{{ n_states }}</span> character states
+    </a>
+</div>
+
+<h2>Characters by anatomical region</h2>
+<table>
+    <thead>
+        <tr><th>Anatomical region</th><th>Characters</th></tr>
+    </thead>
+    <tbody>
+        {% for row in by_region %}
+        <tr>
+            <td>{{ row['anatomical_region'] or '—' }}</td>
+            <td>{{ row['n'] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2">No characters yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

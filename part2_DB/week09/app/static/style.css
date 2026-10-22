@@ -1,0 +1,134 @@
+/* static/style.css — Hominin Character State Database */
+
+body {
+    font-family: Georgia, serif;
+    background-color: #f7f4ee;
+    color: #2b2218;
+    margin: 0;
+}
+
+nav {
+    background-color: #BF5700;
+    padding: 0.75rem 2rem;
+}
+
+nav a {
+    color: #e9e4d6;
+    text-decoration: none;
+    margin-right: 1.5rem;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+nav a.brand {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+main {
+    max-width: 1100px;
+    padding: 1rem 2rem 3rem;
+}
+
+h1 {
+    color: #BF5700;
+    border-bottom: 2px solid #b8a47e;
+    padding-bottom: 0.3rem;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ffffff;
+    margin-top: 0.75rem;
+}
+
+th, td {
+    border: 1px solid #d6cfc0;
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #e6dfcf;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #faf8f3;
+}
+
+td.small {
+    font-size: 0.85rem;
+    color: #5c5345;
+}
+
+a.add {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    color: #BF5700;
+    font-weight: bold;
+}
+
+.cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+}
+
+.card {
+    flex: 1;
+    min-width: 160px;
+    background-color: #ffffff;
+    border: 1px solid #d6cfc0;
+    border-radius: 6px;
+    padding: 1rem;
+    color: #2b2218;
+    text-decoration: none;
+}
+
+.card .count {
+    display: block;
+    font-size: 2rem;
+    color: #BF5700;
+}
+
+form label {
+    display: block;
+    margin-bottom: 0.9rem;
+}
+
+form input, form select, form textarea {
+    display: block;
+    margin-top: 0.25rem;
+    padding: 0.35rem;
+    width: 100%;
+    max-width: 520px;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #BF5700;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    font: inherit;
+    cursor: pointer;
+}
+
+a.cancel {
+    margin-left: 1rem;
+    color: #5c5345;
+}
+
+.error {
+    color: #a12d22;
+    background-color: #fbeceb;
+    border: 1px solid #a12d22;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+}

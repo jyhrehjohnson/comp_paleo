@@ -1,0 +1,10 @@
+## Week09 Reflection (optional)
+
+1. Schema and form feedback. Did building the insert form reveal anything about your schema you did not anticipate? (A field that needed a default? A constraint too strict or too loose? A missing controlled vocabulary?) Describe any changes made.
+- One thing I realized while doing this reflection was that I may need a controlled vocabulary for sources. The majority of the characters come from the same sources so a controlled vocabulary would alleviate spelling errors or date errors when entering a new character. I would also need to change that there can be more than one source to one character. Potentially making a field for primary sources which would be a source that first introduced/described a character and secondary sources which are sources that reference the primary source.
+
+2. Loader vs. manual entry. What are the practical tradeoffs between loading data from a file with a Python script versus entering it one record at a time through a browser form?
+- By using a loader, I can ensure that the data is in the correct format and that the data is consistent. I can also ensure the formatting doesn't go against the constraints of the database. It's easier to debug data entry errors within the loader as well. 
+
+3. One next step. Name one feature you would add to make the app genuinely useful for your own research — search and filter, edit and delete, bulk import, authentication, or something else — and explain why that feature would matter for your project.
+- To mimic my current working database I used for my prospectus, I would add a bulk import and export feature to allow users aka me and my undergrad to load bulk .csv imports into the database without having to manually enter all characters and their necessary information. My hominin character database currently consists of 440 characters and 982 character states. I am also entering post-cranial data so that number will increase, so having the bulk import will assist in uploading the data faster. A bulk export will also make it easier when sharing my data with other researchers. 

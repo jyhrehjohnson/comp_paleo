@@ -8,11 +8,11 @@ import pandas as pd
 print(np.__version__, pd.__version__)
 
 # %% [markdown] 
-# Part 1.4 Python language features used throughout NumPy and pandas
-
-# %% Part 1 - Languages Code
+# ## Part 1.4 Python language features used throughout NumPy and pandas
 # In this code, I attempt to demonstrate each of the five language features we went over in class using 
 # the 'state_province' and 'formation' information from the otb_fossil.csv.
+
+# %% Part 1 - Languages Code
 
 # using list comprehension
 formations = ['Kanapoi', 'Koobi Fora', 'Nachukui', 'Nawata', 'Shungura', 'Usno']
@@ -170,7 +170,7 @@ by_locality = specimens.groupby('locality')['age_ma'].agg(['mean', 'min', 'max',
 print(by_locality)
  
 # %% [markdown]
-# ### Summary
+# ## Summary
 #
 # The Allia Bay locality has the oldest mean age of 3.7 Ma, the remaining localities means are 2.5 Ma or less. 
 # Ileret and Kaito have the most number of specimens (n=3) while Lomekwi and Shungura have the least (n=1).  
@@ -210,76 +210,61 @@ df['avg_age'] = df[['earliest_chronometric_age', 'latest_chronometric_age']].mea
 df['taxon_short'] = df['scientific_name'].str.split().str[0]    # genus only
  
 # %% Q1 — How many specimens belong to each taxon?
-print(df['scientific_name'].value_counts()) #full count
+print(df['scientific_name'].value_counts())
 
-print(df.groupby('scientific_name')['organism_id'].nunique().sort_values(ascending=False)) #remember organisms can be grouped and have several parts
  
 # %% [markdown]
-# How many specimens belong to each taxon?
-# The first result is the full count of the number of specimens for each taxa. 
-# The second result groups the data by organism_id because a specimen can have several 
-# parts like B 7-39 a-c. Not sure which you were asking for, but I noticed that the numbers would be different. 
+# ## **Q1.** How many specimens belong to each taxon?
 #
-# [FULL LIST]
-# scientific_name
-# Hominini                                                335
-# Australopithecus anamensis Leakey et al., 1995          242
-# Paranthropus boisei (Leakey, 1959)                      205
-# Homo erectus (Dubois, 1892)                             154
-# Homo habilis Leakey, Tobias & Napier, 1964              100
-# Homo Linnaeus, 1758                                      91
-# Paranthropus aethiopicus (Arambourg & Coppens, 1967)     66
-# Australopithecus Dart, 1925                              28
-# Paranthropus Broom, 1938                                 20
-# Kenyanthropus platyops Leakey et al., 2001                2
+# | scientific_name                                     | count  |
+# |-----------------------------------------------------|--------|
+# | Hominini                                            |    335 |
+# | Australopithecus anamensis Leakey et al., 1995      |    242 |
+# | Paranthropus boisei (Leakey, 1959)                  |    205 |
+# | Homo erectus (Dubois, 1892)                         |    154 |
+# | Homo habilis Leakey, Tobias & Napier, 1964          |    100 |
+# | Homo Linnaeus, 1758                                 |     91 |
+# | Paranthropus aethiopicus (Arambourg & Coppens, 1967)|     66 |
+# | Australopithecus Dart, 1925                         |     28 |
+# | Paranthropus Broom, 1938                            |     20 |
+# | Kenyanthropus platyops Leakey et al., 2001          |      2 |
 
-# [GROUPED LIST]
-# scientific_name
-# Hominini                                                258
-# Australopithecus anamensis Leakey et al., 1995          124
-# Paranthropus boisei (Leakey, 1959)                       91
-# Paranthropus aethiopicus (Arambourg & Coppens, 1967)     65
-# Homo Linnaeus, 1758                                      43
-# Homo erectus (Dubois, 1892)                              27
-# Homo habilis Leakey, Tobias & Napier, 1964               25
-# Australopithecus Dart, 1925                              18
-# Paranthropus Broom, 1938                                 10
-# Kenyanthropus platyops Leakey et al., 2001                2
- 
 # %% Q2 — What is the mean, minimum, and maximum chronometric age for each locality?
 by_place = df.groupby('place')['avg_age'].agg(['mean', 'min', 'max', 'count'])
 print(by_place.sort_values('mean', ascending=False))
 
 # %% [markdown]
-# What is the mean, minimum, and maximum chronometric age for each locality?
+# ## **Q2.** What is the mean, minimum, and maximum chronometric age for each locality?
 
-#                    mean    min     max  count
-# place                                        
-# Lothagam       4.300000  3.500  5.7500      7
-# Kanapoi        4.124645  4.095  4.1515    179
-# Allia Bay      3.739362  2.700  4.1000     47
-# South Turkwel  3.390000  3.390  3.3900     12
-# Fejej          3.245455  1.925  4.0000     11
-# White Sands    3.200000  3.200  3.2000     11
-# Brown Sands    3.050000  3.050  3.0500     11
-# Type Area      2.360996  1.450  3.4300    251
-# Nachukui       2.214202  0.750  3.5300    163
-# Koobi Fora     1.850887  1.420  3.4000    293
-# Kalam Area     1.847500  1.350  2.3050      6
-# Ileret         1.645223  1.400  4.3000    224
+# | place     |      mean    | min   | max    | count |
+# |---------------|----------|-------|--------|-------|          
+# | Lothagam      | 4.300000 | 3.500 | 5.7500 |     7 |
+# | Kanapoi       | 4.124645 | 4.095 | 4.1515 |   179 |
+# | Allia Bay     | 3.739362 | 2.700 | 4.1000 |    47 |
+# | South Turkwel | 3.390000 | 3.390 | 3.3900 |    12 |
+# | Fejej         | 3.245455 | 1.925 | 4.0000 |    11 |
+# | White Sands   | 3.200000 | 3.200 | 3.2000 |    11 |
+# | Brown Sands   | 3.050000 | 3.050 | 3.0500 |    11 |
+# | Type Area     | 2.360996 | 1.450 | 3.4300 |   251 |
+# | Nachukui      | 2.214202 | 0.750 | 3.5300 |   163 |
+# | Koobi Fora    | 1.850887 | 1.420 | 3.4000 |   293 |
+# | Kalam Area    | 1.847500 | 1.350 | 2.3050 |     6 |
+# | Ileret        | 1.645223 | 1.400 | 4.3000 |   224 |
  
 # %% Q3 — Which skeletal element is most commonly recovered?
 print(df['preparations'].value_counts())
 
 # %% [markdown]
-# Which skeletal element is most commonly recovered?
-# preparations
-# Tooth          688
-# Postcranium    260
-# Cranium        176
-# Mandible       119
+# ## **Q3.** Which skeletal element is most commonly recovered?
+# 
+# | skeletal element  | count |
+# |-------------------|-------|
+# | Tooth             | 688   | 
+# | Postcranium       | 260   | 
+# | Cranium           | 176   | 
+# | Mandible          | 119   |
 
-# Teeth are the most commonly recovered skeletal element. 
+# Teeth (n=688) are the most commonly recovered skeletal element. 
  
 # %% Q4 — Are there any localities where all specimens share the same taxon?
 taxa_per_place = df.groupby('place')['scientific_name'].nunique()
@@ -287,7 +272,7 @@ print(taxa_per_place[taxa_per_place == 1])
 print(df.groupby('place').size()[taxa_per_place == 1])    # how many specimens at each
  
 # %% [markdown]
-# Are there any localities where all specimens share the same taxon?
+# ## **Q4.** Are there any localities where all specimens share the same taxon?
 #
 # A. anamensis specimens come from Kanapoi. 
  
@@ -318,27 +303,32 @@ print(df.groupby('epoch')['scientific_name'].value_counts().unstack(fill_value=0
 print(df.groupby('epoch')['taxon_short'].value_counts(normalize=True).unstack(fill_value=0).T)
  
 # %% [markdown]
-# ### Epoch comparison
-# epoch                                               Pleistocene  Pliocene
-# scientific_name                                                          
-# Australopithecus Dart, 1925                                   0        28
-# Australopithecus anamensis Leakey et al., 1995                0       226
-# Hominini                                                    209       124
-# Homo Linnaeus, 1758                                          83         0
-# Homo erectus (Dubois, 1892)                                 153         0
-# Homo habilis Leakey, Tobias & Napier, 1964                  100         0
-# Kenyanthropus platyops Leakey et al., 2001                    0         2
-# Paranthropus Broom, 1938                                     20         0
-# Paranthropus aethiopicus (Arambourg & Coppens, ...           63         3
-# Paranthropus boisei (Leakey, 1959)                          204         0
-
-# epoch             Pleistocene  Pliocene
-# taxon_short                            
-# Australopithecus     0.000000  0.663185
-# Hominini             0.251202  0.323760
-# Homo                 0.403846  0.000000
-# Kenyanthropus        0.000000  0.005222
-# Paranthropus         0.344952  0.007833
+# ## Epoch comparison
+#                                              
+# | scientific_name                               |                       epoch |                                       
+# |-----------------------------------------------|-----------------------------|                                                         
+# |-----------------------------------------------|        Pleistocene  Pliocene|                                                   
+# | Australopithecus Dart, 1925                   |                0        28  |
+# | Australopithecus anamensis Leakey et al., 1995|                0       226  |
+# | Hominini                                      |              209       124  |
+# | Homo Linnaeus, 1758                           |               83         0  |
+# | Homo erectus (Dubois, 1892)                   |              153         0  |
+# | Homo habilis Leakey, Tobias & Napier, 1964    |              100         0  |
+# | Kenyanthropus platyops Leakey et al., 2001    |                0         2  |
+# | Paranthropus Broom, 1938                      |               20         0  |
+# | Paranthropus aethiopicus (Arambourg & Coppens |               63         3  |
+# | Paranthropus boisei (Leakey, 1959)            |              204         0  |
+#
+#
+# |------------------|------------------------|
+# | taxon_short      |        epoch           |
+# |------------------|------------------------|
+# |------------------|  Pleistocene Pliocene  |
+# | Australopithecus |    0.000000  0.663185  |
+# | Hominini         |    0.251202  0.323760  |
+# | Homo             |    0.403846  0.000000  |
+# | Kenyanthropus    |    0.000000  0.005222  |
+# | Paranthropus     |    0.344952  0.007833  |
 
 # The Pleistocene has 832 specimens, while the Pliocene has 383 specimens. 
 # Australopithecus and Kenyanthropus are the only taxa that appear in the Pliocene only.

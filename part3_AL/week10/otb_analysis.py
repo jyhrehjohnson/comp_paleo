@@ -1,6 +1,5 @@
 # %% [markdown]
 # #Part 1 - Position and Python Basics
-# ## In Part 1, I attempt to demonstrate each of the five language features we went over in class using the 'state_province' and 'formation' information from the otb_fossil.csv
 
 # %% Setup
 import numpy as np
@@ -9,9 +8,13 @@ import pandas as pd
 print(np.__version__, pd.__version__)
 
 # %% [markdown] 
-# # Part 1.4 Python language features used throughout NumPy and pandas
+# Part 1.4 Python language features used throughout NumPy and pandas
 
-# %% Part 1 - list comprehension
+# %% Part 1 - Languages Code
+# In this code, I attempt to demonstrate each of the five language features we went over in class using 
+# the 'state_province' and 'formation' information from the otb_fossil.csv.
+
+# using list comprehension
 formations = ['Kanapoi', 'Koobi Fora', 'Nachukui', 'Nawata', 'Shungura', 'Usno']
 provinces = ['South Ethiopia', 'Marsabit', 'Turkana']
  
@@ -20,21 +23,20 @@ kenyan_provinces = [p for p in provinces if p != 'South Ethiopia']
 print(formation_labels)
 print(kenyan_provinces)
  
-# %% Part 1 — dictionary comprehension
+# using dictionary comprehension
 formation_province = {'Kanapoi': 'Turkana', 'Koobi Fora': 'Marsabit', 'Nachukui': 'Turkana',
                       'Nawata': 'Turkana', 'Shungura': 'South Ethiopia', 'Usno': 'South Ethiopia'}
  
-# Oldest and youngest earliest_chronometric_age per formation in this dataset (Ma)
 formation_ages = {'Kanapoi': (4.20, 4.12), 'Koobi Fora': (4.30, 1.42), 'Nachukui': (5.00, 0.75),
-                  'Nawata': (6.50, 6.50), 'Shungura': (3.50, 1.35), 'Usno': (3.21, 3.05)}
+                  'Nawata': (6.50, 6.50), 'Shungura': (3.50, 1.35), 'Usno': (3.21, 3.05)} #oldest and youngest ages
  
 turkana_formations = {f: p for f, p in formation_province.items() if p == 'Turkana'}
 age_span = {f: round(oldest - youngest, 2) for f, (oldest, youngest) in formation_ages.items()}
 print(turkana_formations)
 print(age_span)
 
-# %% Part 1 — enumerate and zip
-province_counts = [580, 291, 372]       #specimens per province
+# using enumerate and zip
+province_counts = [580, 291, 372] #number of specimens per province
  
 for province, n in zip(provinces, province_counts):
     print(f"{province}: {n} specimens")
@@ -42,7 +44,7 @@ for province, n in zip(provinces, province_counts):
 for rank, formation in enumerate(sorted(formations), start=1):
     print(rank, formation, '->', formation_province[formation])
  
-# %% Part 1 — *args and **kwargs
+# using *args and **kwargs
 def describe_province(province, *formation_names, **details):
     """One province, any number of formations, any extra details."""
     print(f"{province}: {', '.join(formation_names)}")
@@ -52,11 +54,9 @@ def describe_province(province, *formation_names, **details):
 describe_province('Turkana', 'Kanapoi', 'Nachukui', 'Nawata', country='Kenya', n_specimens=372)
 describe_province('South Ethiopia', 'Shungura', 'Usno', 'Koobi Fora', country='Ethiopia')
 
-# %% Part 1 — lambda
-# Formations ordered from oldest to youngest specimen age
-oldest_first = sorted(formation_ages, key=lambda f: formation_ages[f][0], reverse=True)
-# Province with the most specimens
-biggest = max(zip(provinces, province_counts), key=lambda pair: pair[1])
+# using lambda functions
+oldest_first = sorted(formation_ages, key=lambda f: formation_ages[f][0], reverse=True) #order formations from oldest to youngest
+biggest = max(zip(provinces, province_counts), key=lambda pair: pair[1]) #province with the most specimens
 print(oldest_first)
 print(biggest)
 
@@ -65,23 +65,26 @@ print(biggest)
 # What is a virtual environment and why do we need it?
 #
 # A virtual environment is a separate project directory with its own python interpreter and requirements. 
-# A virtual environment is needed because what is coded here is separate from the overall project, so nothing globally will be changed.
+# A virtual environment is needed because what is coded here is separate from the overall project, 
+# so nothing globally will be changed.
 
 
 # %% [markdown]
 # ## Part 2 — NumPy
  
-# %% Part 2 — 1-D array of stratigraphic ages
+# %% Part 2 — Code
+# 2.1 1-D array of stratigraphic ages
 ages = np.array([4.17, 3.97, 3.44, 3.30, 2.95, 2.71, 2.52, 2.33, 2.05, 1.88, 1.61, 1.53])
 print(ages.dtype)
 print(ages.shape)
 print(ages.ndim)
- 
-ages_ka = ages * 1000          # Ma -> ka
+
+# 2.2 vectorized arithmetic
+ages_ka = ages * 1000 #Ma -> ka
 print(ages_ka)
  
-# %% Part 2 — 2-D array
-# 6 specimens × 3 measurements (corpus height, corpus breadth, M1 length; all mm)
+# 2-D array
+# 6 specimens × 3 measurements (corpus height, corpus breadth, M1 length) [used characters from project]
 measurements = np.array([
     [32.1, 20.4, 13.2],
     [28.7, 18.9, 12.6],
@@ -91,48 +94,51 @@ measurements = np.array([
     [30.3, 19.5, 12.9],
 ])
 print(measurements.shape)
-print(measurements[3, :])      # fourth specimen, all measurements
-print(measurements[:, 2])      # all specimens, M1 length only
- 
-col_means = measurements.mean(axis=0)   # mean of each measurement
-row_stds = measurements.std(axis=1)     # spread of measurements within each specimen
+print(measurements[3, :])      
+print(measurements[:, 2])      
+
+# 2.4 Axis operations 
+col_means = measurements.mean(axis=0) #mean of each measurement
+row_stds = measurements.std(axis=1) #spread of measurements within each specimen
 print(col_means)
 print(row_stds)
+
  
-# %% Part 2 — boolean and fancy indexing
-window = ages[(ages > 1.9) & (ages < 2.6)]      # specimens between 1.9 and 2.6 Ma
+# 2.3 Boolean and fancy indexing
+window = ages[(ages > 1.9) & (ages < 2.6)]
 print(window)
  
-idx = np.array([0, 5, 11])
-print(ages[idx])                                # ages at positions 0, 5, 11
+idx = np.array([0, 5, 7])
+print(ages[idx])
  
-edges = ages[(ages >= 2.58) | (ages < 1.7)]     # Pliocene OR younger than 1.7 Ma
+edges = ages[(ages >= 2.58) | (ages < 1.7)]
 print(edges)
  
 # %% [markdown]
-# ### Why NumPy beats Python loops
-# TODO (your own words, 3–5 sentences). Points to cover:
-# - one dtype + contiguous memory → the loop runs in compiled C, with no per-element type checks
-# - a Python `for` loop handles each element as a separate Python object
-# - when a loop really is needed: each step depends on the previous result (e.g. a sequential
-#   simulation), complex branching per item, or work on non-numeric Python objects
+# ### Why NumPy vs. Python loops
+# 
+# NumPy operations are faster than Python loops because Python for loops handle each element separately as there own independent objects
+# and NumPy compiles same type data together and runs on the combined data all at once. A for loop is needed when steps in a code depend
+# on each other. For instance, with MorphoDelim, I need to use a Python for loop during my two delimitation protocols (sequential and simultaneous) 
+# as the simulations need to run randomly. A vectorized operation would force values to my simulation.
  
 # %% [markdown]
 # ## Part 3 — pandas
  
-# %% Part 3 — Series
+# %% Part 3 - Code
+# 3.1 Series
 specimen_counts = pd.Series(
     [143, 61, 228, 37, 95, 172],
     index=['Lomekwi', 'Kaitio', 'Ileret', 'Kangatukuseo', 'Allia Bay', 'Shungura'],
 )
-print(specimen_counts['Ileret'])                    # label-based access
-print(specimen_counts.iloc[2])                      # integer position (specimen_counts[2] raises KeyError in pandas 3)
-print(specimen_counts[specimen_counts > 100])       # boolean filter
+print(specimen_counts['Ileret']) #labels     
+print(specimen_counts.iloc[2])     
+print(specimen_counts[specimen_counts > 100]) #boolean filter
  
-# %% Part 3 — DataFrame
+# 3.2 — DataFrame
 specimens = pd.DataFrame({
-    'specimen_id': ['DEMO-01', 'DEMO-02', 'DEMO-03', 'DEMO-04', 'DEMO-05',
-                    'DEMO-06', 'DEMO-07', 'DEMO-08', 'DEMO-09', 'DEMO-10'],
+    'specimen_id': ['01', '02', '03', '04', '05',
+                    '06', '07', '08', '09', '10'],
     'taxon':       ['Paranthropus', 'Homo', 'Australopithecus', 'Paranthropus', 'Homo',
                     'Australopithecus', 'Homo', 'Paranthropus', None, 'Homo'],
     'locality':    ['Ileret', 'Kaitio', 'Allia Bay', 'Shungura', 'Ileret',
@@ -144,17 +150,17 @@ specimens = pd.DataFrame({
 specimens.info()
 print(specimens.describe())
  
-# %% Part 3 — .loc and .iloc
+# 3.4 - Indexing ().loc and .iloc)
 print(specimens.loc[specimens['locality'] == 'Ileret', ['specimen_id', 'taxon', 'age_ma']])
 print(specimens.iloc[2:5, 0:3])
  
-# %% Part 3 — derived columns
+# 3.5 - Derived columns
 specimens['age_ka'] = specimens['age_ma'] * 1000
 specimens['epoch'] = specimens['age_ma'].apply(lambda x: 'Pleistocene' if x < 2.58 else 'Pliocene')
 specimens['identified'] = specimens['taxon'].notnull()
 print(specimens.head())
  
-# %% Part 3 — sorting and grouping
+# 3.6 - Sorting and grouping
 specimens = specimens.sort_values('age_ma', ascending=False)
 print(specimens)
  
@@ -164,35 +170,34 @@ by_locality = specimens.groupby('locality')['age_ma'].agg(['mean', 'min', 'max',
 print(by_locality)
  
 # %% [markdown]
-# ### What the summary shows
-# TODO (2–3 sentences, based on the output above). Things to look at: which localities give the
-# oldest mean ages, which have a wide age range, and that the unidentified specimen
-# drops out of `value_counts()`.
+# ### Summary
+#
+# The Allia Bay locality has the oldest mean age of 3.7 Ma, the remaining localities means are 2.5 Ma or less. 
+# Ileret and Kaito have the most number of specimens (n=3) while Lomekwi and Shungura have the least (n=1).  
  
 # %% [markdown]
 # ## Part 4 — OTB analysis
  
-# %% Part 4 — load
-# From the database (preferred, once the view matches this file's columns):
-# from sqlalchemy import create_engine
-# from config import DSN       # never hardcode credentials
-# engine = create_engine(DSN)
-# df = pd.read_sql('SELECT * FROM otb_fossils_export', engine)
- 
-df = pd.read_csv('otb_fossils.tsv', sep='\t')
- 
-# %% Part 4 — inspect
+# %% Part 4 — load the data
+# Used the first option and ran it in my own terminal
+#
+# psql -d informatics -c "\COPY ( \
+#    SELECT f.catalog_number, f.organism_id, f.preparations, t.scientific_name, \
+#           l.place, l.locality, l.country, \
+#           f.earliest_chronometric_age, f.latest_chronometric_age, f.verbatim_chronometric_age \
+#    FROM fossils f \
+#    JOIN taxa t USING (taxon_id) \
+#    JOIN localities l USING (locality_id) \
+#    ORDER BY f.catalog_number \
+#  ) TO 'otb_export.csv' CSV HEADER"
+
+df = pd.read_csv('otb_export.csv') #load in data from psql 
+
+# %% Inspect that the data loaded correctly
 print(df.shape)
 print(df.dtypes)
 print(df.isnull().sum())
 print(df.describe())
- 
-# %% [markdown]
-# ### First look — anything unexpected?
-# TODO, based on the output above (and the next cell). Things to check:
-# - Which columns have missing values, and how many specimens have no numeric age?
-# - Is the earliest age ever younger than the latest?
-# - Do the min/max ages fall in a plausible range? (Check the Lothagam specimens at the old end.)
  
 # %% Part 4 — quality checks
 print(df.loc[df['earliest_chronometric_age'] < df['latest_chronometric_age'], 'catalog_number'])
@@ -205,27 +210,76 @@ df['avg_age'] = df[['earliest_chronometric_age', 'latest_chronometric_age']].mea
 df['taxon_short'] = df['scientific_name'].str.split().str[0]    # genus only
  
 # %% Q1 — How many specimens belong to each taxon?
-print(df['scientific_name'].value_counts())
- 
-# Catalogued parts vs. distinct individuals (one organism_id can have several parts: a, b, c…)
-print(df.groupby('scientific_name')['organism_id'].nunique().sort_values(ascending=False))
+print(df['scientific_name'].value_counts()) #full count
+
+print(df.groupby('scientific_name')['organism_id'].nunique().sort_values(ascending=False)) #remember organisms can be grouped and have several parts
  
 # %% [markdown]
-# **Q1.** TODO: one sentence (most common taxon; how many are only "Hominini";
-# how much multi-part specimens inflate the counts — compare the two outputs).
+# How many specimens belong to each taxon?
+# The first result is the full count of the number of specimens for each taxa. 
+# The second result groups the data by organism_id because a specimen can have several 
+# parts like B 7-39 a-c. Not sure which you were asking for, but I noticed that the numbers would be different. 
+#
+# [FULL LIST]
+# scientific_name
+# Hominini                                                335
+# Australopithecus anamensis Leakey et al., 1995          242
+# Paranthropus boisei (Leakey, 1959)                      205
+# Homo erectus (Dubois, 1892)                             154
+# Homo habilis Leakey, Tobias & Napier, 1964              100
+# Homo Linnaeus, 1758                                      91
+# Paranthropus aethiopicus (Arambourg & Coppens, 1967)     66
+# Australopithecus Dart, 1925                              28
+# Paranthropus Broom, 1938                                 20
+# Kenyanthropus platyops Leakey et al., 2001                2
+
+# [GROUPED LIST]
+# scientific_name
+# Hominini                                                258
+# Australopithecus anamensis Leakey et al., 1995          124
+# Paranthropus boisei (Leakey, 1959)                       91
+# Paranthropus aethiopicus (Arambourg & Coppens, 1967)     65
+# Homo Linnaeus, 1758                                      43
+# Homo erectus (Dubois, 1892)                              27
+# Homo habilis Leakey, Tobias & Napier, 1964               25
+# Australopithecus Dart, 1925                              18
+# Paranthropus Broom, 1938                                 10
+# Kenyanthropus platyops Leakey et al., 2001                2
  
-# %% Q2 — mean, minimum, and maximum chronometric age for each locality
+# %% Q2 — What is the mean, minimum, and maximum chronometric age for each locality?
 by_place = df.groupby('place')['avg_age'].agg(['mean', 'min', 'max', 'count'])
 print(by_place.sort_values('mean', ascending=False))
- 
+
 # %% [markdown]
-# **Q2.** TODO: one sentence (oldest/youngest places; any with a suspiciously wide range).
+# What is the mean, minimum, and maximum chronometric age for each locality?
+
+#                    mean    min     max  count
+# place                                        
+# Lothagam       4.300000  3.500  5.7500      7
+# Kanapoi        4.124645  4.095  4.1515    179
+# Allia Bay      3.739362  2.700  4.1000     47
+# South Turkwel  3.390000  3.390  3.3900     12
+# Fejej          3.245455  1.925  4.0000     11
+# White Sands    3.200000  3.200  3.2000     11
+# Brown Sands    3.050000  3.050  3.0500     11
+# Type Area      2.360996  1.450  3.4300    251
+# Nachukui       2.214202  0.750  3.5300    163
+# Koobi Fora     1.850887  1.420  3.4000    293
+# Kalam Area     1.847500  1.350  2.3050      6
+# Ileret         1.645223  1.400  4.3000    224
  
 # %% Q3 — Which skeletal element is most commonly recovered?
 print(df['preparations'].value_counts())
- 
+
 # %% [markdown]
-# **Q3.** TODO: one sentence (and whether it fits the usual taphonomic bias toward teeth and jaws).
+# Which skeletal element is most commonly recovered?
+# preparations
+# Tooth          688
+# Postcranium    260
+# Cranium        176
+# Mandible       119
+
+# Teeth are the most commonly recovered skeletal element. 
  
 # %% Q4 — Are there any localities where all specimens share the same taxon?
 taxa_per_place = df.groupby('place')['scientific_name'].nunique()
@@ -233,12 +287,13 @@ print(taxa_per_place[taxa_per_place == 1])
 print(df.groupby('place').size()[taxa_per_place == 1])    # how many specimens at each
  
 # %% [markdown]
-# **Q4.** TODO: one sentence. Check which taxon each one is — a place can be "single-taxon"
-# because everything there is indeterminate "Hominini".
+# Are there any localities where all specimens share the same taxon?
+#
+# A. anamensis specimens come from Kanapoi. 
  
 # %% Part 4 — NumPy on earliest_chronometric_age
 ages = df['earliest_chronometric_age'].to_numpy()
-ages = ages[~np.isnan(ages)]                  # drop missing ages
+ages = ages[~np.isnan(ages)] #get rid of missing ages
  
 mean = ages.mean()
 sd = ages.std()
@@ -250,21 +305,41 @@ print(sd)
 print(proportion)
  
 # %% [markdown]
-# For a normal distribution, ~0.68 would fall within 1 SD. TODO: say whether your value is
-# higher or lower, and what that suggests about the age distribution (clustered vs. spread out
-# or bimodal).
+# Mean = 2.4852962962962963
+# Standard deviation = 0.9741868164581002
+# Proportion + 0.7135802469135802
  
-# %% Part 4 — epoch
-# Missing ages stay missing rather than being labelled 'Pliocene' by the else branch
-df['epoch'] = df['avg_age'].apply(lambda x: None if pd.isnull(x) else ('Pleistocene' if x < 2.58 else 'Pliocene'))
+# %% Part 4 — Add epoch column
+df['epoch'] = df['avg_age'].apply(lambda x: None if pd.isnull(x) else ('Pleistocene' if x < 2.58 else 'Pliocene')) #keep missing data as missing
 print(df['epoch'].value_counts(dropna=False))
  
 # %% Part 4 — taxon composition by epoch
-print(df.groupby('epoch')['scientific_name'].value_counts().unstack(fill_value=0).T)
+print(df.groupby('epoch')['scientific_name'].value_counts().unstack(fill_value=0).T) 
 print(df.groupby('epoch')['taxon_short'].value_counts(normalize=True).unstack(fill_value=0).T)
  
 # %% [markdown]
 # ### Epoch comparison
-# TODO (3–4 sentences): which taxa/genera are confined to one epoch, which cross the boundary,
-# how the sample sizes differ, and one caveat (e.g. specimens with wide age ranges straddling
-# 2.58 Ma get classified only by their midpoint).
+# epoch                                               Pleistocene  Pliocene
+# scientific_name                                                          
+# Australopithecus Dart, 1925                                   0        28
+# Australopithecus anamensis Leakey et al., 1995                0       226
+# Hominini                                                    209       124
+# Homo Linnaeus, 1758                                          83         0
+# Homo erectus (Dubois, 1892)                                 153         0
+# Homo habilis Leakey, Tobias & Napier, 1964                  100         0
+# Kenyanthropus platyops Leakey et al., 2001                    0         2
+# Paranthropus Broom, 1938                                     20         0
+# Paranthropus aethiopicus (Arambourg & Coppens, ...           63         3
+# Paranthropus boisei (Leakey, 1959)                          204         0
+
+# epoch             Pleistocene  Pliocene
+# taxon_short                            
+# Australopithecus     0.000000  0.663185
+# Hominini             0.251202  0.323760
+# Homo                 0.403846  0.000000
+# Kenyanthropus        0.000000  0.005222
+# Paranthropus         0.344952  0.007833
+
+# The Pleistocene has 832 specimens, while the Pliocene has 383 specimens. 
+# Australopithecus and Kenyanthropus are the only taxa that appear in the Pliocene only.
+# Homo appears in the Pleistocene only. Paranthropus and Hominini span both epochs. 

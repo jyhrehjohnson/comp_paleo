@@ -94,24 +94,14 @@ print(fossils_csv.dtypes)
 # **(c)** One scientific scenario where you would use dtype on read_csv to
 # override the default inference.
 # - When using catalog numbers. If a dataset stores the prefix ("KNM-ER") in one column and
-# the number ("1470", "0406") in another, pandas reads the number column as 'int64'. That drops
-# leading zeros ("0406" becomes 406), and an integer column will not match a text column when
-# joining. Using dtype={'catalog_number': str} keeps the values as text.
+# the number ("1470") in another, pandas would read the number column as 'int64'. That drops
+# leading zeros and an integer column will not match a text column when
+# joining. Using dtype = catalog_number: str keeps the values as text.
 
 # [3]
 # **Identifying at least two columns where the dtype differs and explain why the same data
 # produces different types depending on the source format.**
-# - No columns differ in dtype between read_sql and read_csv. This is because of how my
-#   table is built and how read_sql works:
-#   * date_identified and date_created are stored as TEXT in PostgreSQL, not DATE or
-#     TIMESTAMP, so read_sql returns them as strings, the same as read_csv. If they were
-#     TIMESTAMP columns, read_sql would return datetime64 while read_csv would return text.
-#   * The chronometric ages are NUMERIC in PostgreSQL. The database driver returns NUMERIC
-#     values as Python Decimal objects, but read_sql converts them to float64 by default
-#     (coerce_float=True), which is the same type read_csv guesses from the text.
-#   * year is an INTEGER in the database but float64 from both sources, because some
-#     fossils have no year and NaN cannot be stored in an int64 column. So the two sources
-#     agree with each other, but neither matches the database type.
+# - No columns differ in dtype between read_sql and read_csv.
 #
 # OUTPUT
 # From SQL:
@@ -224,9 +214,9 @@ print(ecv_by_bin_grade)
 # %% [markdown]
 # ## 2.6 Deliverable - Part 2
 # [2]
-# Explain why you might exclude Australopithecus from a study focused on the
+# **Explain why you might exclude Australopithecus from a study focused on the
 # Turkana Basin — what does the geographic distribution of the species in your
-# dataset tell you?
+# dataset tell you?**
 #
 # Australopithecus ECVs come from outside the Omo-Turkana Basin:
 # Au. afarensis is from Hadar, Au. africanus is from South Africa, and
@@ -243,8 +233,7 @@ print(ecv_by_bin_grade)
 #
 # When looking at things by grade the trend is not the same for each grade:
 # - `mega` (Paranthropus) stays the same.
-# - `trans` (H. habilis) only appears in one bin but has a wide range
-#   (~500 (KNM-ER 1813) to ~750-790 (KNM-ER 1470 and 1590)).
+# - `trans` (H. habilis) only appears in one bin but has a wide range ~500 (KNM-ER 1813) to ~750-790 (KNM-ER 1470).
 # - `pre.mod` (Homo erectus and later) increases, but the youngest bin has
 #   few specimens.
 
@@ -349,68 +338,49 @@ print(pivot)
 # ## Deliverable - Part 3
 # [1]
 # **Changes made and why:**
-# 1. **Authorities removed from OTB names.** My database stores names with the
-#    author and year (e.g. "Homo erectus (Dubois, 1892)"), while Du et al. use
-#    the plain binomial ("Homo erectus"). I used the name_fix dict to remove the
-#    authorities. This is a formatting change only; the species are the same.
+# 1. **Names** 
+#    The OTB database stores names with the author and year (e.g. "Homo erectus (Dubois, 1892)"), 
+#    while Du et al. use the traditional name ("Homo erectus"). 
+#    I used the name_fix dict to remove the publication and year. 
+
 # 2. **Abbreviations in the ECV table** ("P. boisei" -> "Paranthropus boisei").
-#    Also a formatting change only.
-# 3. **KNM-ER 1470: Homo habilis -> Homo rudolfensis**, in both the ECV table
-#    and my OTB table, for this specimen only. 1470 is the holotype of
-#    H. rudolfensis, and I follow the view that it is distinct from H. habilis.
-#    I had to change it in both tables because my OTB database has no
-#    H. rudolfensis; changing only the ECV table would have left the
-#    rudolfensis ECV with no fossils to match. I did not rename all H. habilis,
-#    because that would decide the habilis/rudolfensis question for every
-#    specimen. Two cautions: the H. rudolfensis ECV (756.2 cm3) comes from a
-#    single cranium, and removing 1470 lowers the H. habilis mean, so part of
-#    the size gap between the two species comes from the reclassification
-#    itself. Other specimens often assigned to H. rudolfensis (e.g. KNM-ER
-#    1590) were left as they are in my database.
-# 4. **Genus- and tribe-level identifications were not changed.** Fossils
-#    identified only as Homo, Paranthropus, Australopithecus or Hominini cannot
-#    be given a species-level ECV, so they stay unmatched.
+#    This is only a formatting change to match.
+
+# 3. **KNM-ER 1470: Homo habilis -> Homo rudolfensis**
+#    I did not rename every "Homo habilis" to "Homo rudolfensis", because that would merge the two species into one. 
+#    Changing the one specimen follows the classification already used in the OTB database. The differences
+#    in ecv warrant a split until other evidence is provided as to why they should both be H. habilis.
+#    I did not rename all H. habilis, because that would decide the habilis/rudolfensis question for every
+#    specimen. 
 #
 # [2]
 # **Why fossils_ecv has the same number of rows as fossils.**
 # A left join keeps every row of the left table (fossils). Because ecv_by_taxon
-# has only one row per taxon, each fossil matches at most one row, so no fossil
-# is duplicated. Fossils with no match are kept and get NaN. Only the number of
+# has only one row per taxon, each fossil matches to one row, so no fossil
+# is duplicated. Fossils with no match are kept and get NaN. The number of
 # columns goes up: (1243, 26) -> (1243, 34).
 #
-# **Fossils with no ECV.** [fill in from output: should be 718 after the name fix]
-# The responsible taxa are the genus- or tribe-level identifications (Hominini,
-# Homo, Australopithecus, Paranthropus) and the two species with no published
-# endocast (Australopithecus anamensis, Kenyanthropus platyops).
+# **Fossils with no ECV.** 
+# 718
+# This number is made up from Hominini, Homo, Australopithecus, Paranthropus. Two species have no published
+# endocast: Australopithecus anamensis, Kenyanthropus platyops.
 #
 # [3]
-# **Small number of specimen matches.** [fill in: number printed by the specimen join]
-# OTB fossils matched a Du et al. ECV.
-# - ECV can only be measured on a fairly complete braincase. Most OTB specimens
-#   are teeth, mandibles and postcrania, so only a few could ever have an ECV.
-# - Catalog numbers have to match exactly. "KNM-ER 1470" and "KNM ER 1470" are
-#   different strings to pandas.
-# - The OTB database can catalog the parts of one individual as separate
-#   specimens under the same organism_id, while Du et al. report one ECV for
-#   the reconstructed cranium.
-# - Du et al. only include published ECVs, which favor famous, well-preserved crania.
-# So the taxon-level ECV for each species comes from a handful of crania but is
-# applied to hundreds of OTB specimens.
+# **Small number of specimen matches.** 
+# - ECV can only be measured on a fairly complete braincase. Most OTB
+#   specimens are teeth, mandibles, and postcrania, so only a small number specimens actually could 
+#   have an ECV.
+# - Catalog numbers have to be an exact match. "KNM-ER 1470" and "KNM ER 1470"
+#   are different strings to pandas.
+# - The OTB database catalogs multiple specimens as separate entities under the same organism_id. 
+#   database may catalog as separate pieces.
+# - Du et al. only include published ECVs well-preserved crania.
 #
 # [4]
 # **Interpreting the pivot table.**
-# Because ecv_mean was joined by taxon, each row has the same value in every
-# time bin, so the table does not show brain size changing through time.
-# Instead it shows the time range of each species in my OTB database, labeled
-# with its average ECV. The useful comparison is within each bin: in both the
-# Plio-Pleistocene and Early Pleistocene bins, Paranthropus (~440-490 cm3)
-# occurs alongside early Homo (H. habilis, H. rudolfensis and H. erectus), so
-# several hominin species with very different brain sizes lived in the basin
-# at the same time. The H. rudolfensis row contains only KNM-ER 1470.
-# The H. erectus value (918.7 cm3) is higher than the Turkana H. erectus crania
-# alone (~771 cm3 in the OTB subset), because the taxon mean includes
-# H. erectus from other regions. Taxa identified only to genus or tribe, and
-# taxa with no published endocast, do not appear in the table.
+# The Plio-Pleistocene and Early Pleistocene bins, Paranthropus (~440-490 cm3)
+# occurs alongside early Homo, so there are several hominin species with very different 
+# brain sizes lived in the basin at the same time. 
 
 # %% [markdown]
 # ## Part 4 - OTB + ECV Analysis
@@ -468,7 +438,9 @@ print(f"Fraction with only one estimate: {frac_single:.2f}")
 
 # %% Add locality names from the localities table
 localities = pd.read_sql("SELECT * FROM localities", engine)
-print(localities.columns.tolist())  # check the name column is called "place"
+print(localities.columns.tolist())  
+
+fossils_ecv = fossils_ecv.drop(columns=["place", "place_x", "place_y"], errors="ignore") #Remove place_x and place_y
 
 fossils_ecv = pd.merge(
     fossils_ecv, localities[["locality_id", "place"]], on="locality_id", how="left"
@@ -507,26 +479,20 @@ print(
 # A median of two estimates is just the average of two values. 
 #
 #
-# **Most diverse locality.** [fill in: locality name] has the most distinct taxa
-# ([fill in: number]). Its fossils come from [fill in: formation / member(s)] and
-# span [fill in: age span] Ma. Across the taxa there, mean ECV is
-# [fill in] cm3, ranging from [fill in] to [fill in] cm3.
-# Note: genus- and tribe-level names (Homo, Paranthropus, Hominini) count as
-# separate taxa here, which may inflate the count.
+# **Most Diverse Locality.** 
+# The Type Area has the most distinct taxa with 8. All of its fossils come from 
+# the Shungura Formation (Omo, Ethiopia). 
 #
-# **What the diversity means.** A locality with many taxa can mean two
-# different things, and the age span printed above helps tell them apart:
+# Four taxa are present, and have ECV
+# - Paranthropus aethiopicus: 442.7 cm3
+# - Paranthropus boisei: 487.9 cm3
+# - Homo habilis: 633.0 cm3
+# - Homo erectus: 918.7 cm3
+# Mean ECV across these taxa is 620.6 cm3, with a range of 442.7 to 918.7 cm3.
 #
-# * **Long time span.** If the specimen ages spread over hundreds of
-#   thousands of years, the locality is probably combining many layers of
-#   sediment under one name. The taxa may never have lived at the same time.
-# * **True coexistence.** If the ages cluster tightly (for example around the
-#   KBS Tuff, ~1.87 Ma), several hominin species shared the same landscape.
-#   This is the well-known Turkana pattern of P. boisei, early Homo, and
-#   H. erectus overlapping between about 1.9 and 1.5 Ma.
-#
-# The ECV range across these taxa (Paranthropus ~450-500 vs Homo ~600-900)
-# shows that if they did live together, they had very different brain
-# sizes, which fits with them using different resources. Large river and
-# delta deposits also collect fossils from a wide area, which can raise the
-# number of taxa found at one locality.
+# **What the Diversity Means.** 
+# The age span points to a long temporal span. The Type Area combines about
+# 2 million years of Omo River deposits under one locality name, and its
+# members are stacked in time and dated by tuffs. Most Shungura hominins are also
+# isolated teeth collected from the surface of each member, so this could explain all of
+# the genus identifications instead of species identification.

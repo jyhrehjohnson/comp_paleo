@@ -1,0 +1,36 @@
+---
+title: "Hominin ECV Analysis"
+author: "Jyhreh Johnson"
+date: 11/18/2026
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+---
+
+```{python}
+#| label: setup
+#| message: false
+
+# 1.3 First chunk: load the data
+
+import pandas as pd
+import numpy as np
+import statsmodels.formula.api as smf
+import patsy
+from plotnine import *
+
+ecv = pd.read_csv('~/Documents/UT/comp_paleo/part3_AL/week11/ecv_by_specimen.csv')
+
+# Put the grades in evolutionary order (otherwise they sort alphabetically)
+grade_order = ['archaic', 'mega', 'trans', 'pre.mod']
+ecv['grade'] = pd.Categorical(ecv['grade'], categories=grade_order, ordered=True)
+
+print(ecv.shape)
+print('Missing grades:', ecv['grade'].isna().sum())
+ecv.head()
+```
+

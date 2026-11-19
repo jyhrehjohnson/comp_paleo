@@ -197,7 +197,7 @@ As shown in @fig-ecv-fitted, ECV increases toward the present, though considerab
 
 **Question 4.1: Render the document and confirm that @fig-ecv-fitted resolves to "Figure 1" (or the appropriate number) in the HTML output. If the reference does not resolve, what does Quarto show instead, and what does that tell you about the label?**
 
- - The cross-reference resolves in the rendered html. `@fig-ecv-fitted` appears as "Figure 2" because the residual plot (`@fig-residuals`) is the first labeled figure. If the reference did not resolve, Quarto would show the raw label in bold with a question mark and print a warning. Meaning Quarto could not find a figure with that label or the chunk did not produce a figure.
+ - The reference resolves in the rendered html. If the reference did not resolve, Quarto would show the raw label in bold with a warning. The html would have down arrow and "Code". Meaning Quarto could not find a figure with that label or the chunk did not produce a figure.
 
  
 ### 4.2 Inline Python Results

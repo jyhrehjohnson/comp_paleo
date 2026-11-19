@@ -2322,7 +2322,7 @@ var requirejs,require,define;(function(global,setTimeout){var req,s,head,baseEle
 <pre><code>(94, 8)
 Missing grades: 0</code></pre>
 </div>
-<div id="setup" class="cell-output cell-output-display" data-execution_count="13">
+<div id="setup" class="cell-output cell-output-display" data-execution_count="1">
 <div>
 
 
@@ -2510,7 +2510,7 @@ X2 columns: [&#39;Intercept&#39;, &#39;C(grade)[T.mega]&#39;, &#39;C(grade)[T.tr
 </section>
 <section id="fitting-a-model" class="level2">
 <h2 class="anchored" data-anchor-id="fitting-a-model">Fitting a Model</h2>
-<div id="8dda1991" class="cell" data-execution_count="5">
+<div id="d31584d3" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
@@ -2528,7 +2528,7 @@ Dep. Variable:         ecv_median_cm3   R-squared:                       0.750
 Model:                            OLS   Adj. R-squared:                  0.748
 Method:                 Least Squares   F-statistic:                     276.6
 Date:                Thu, 19 Nov 2026   Prob (F-statistic):           1.79e-29
-Time:                        15:50:07   Log-Likelihood:                -593.86
+Time:                        15:58:17   Log-Likelihood:                -593.86
 No. Observations:                  94   AIC:                             1192.
 Df Residuals:                      92   BIC:                             1197.
 Df Model:                           1                                         
@@ -2552,7 +2552,7 @@ Notes:
 </section>
 <section id="accessing-results-programmatically" class="level2">
 <h2 class="anchored" data-anchor-id="accessing-results-programmatically">Accessing Results Programmatically</h2>
-<div id="280f24c2" class="cell" data-execution_count="6">
+<div id="75f33cd7" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Individual attributes</span></span>
@@ -2590,7 +2590,7 @@ Dep. Variable:         ecv_median_cm3   R-squared:                       0.750
 Model:                            OLS   Adj. R-squared:                  0.748
 Method:                 Least Squares   F-statistic:                     276.6
 Date:                Thu, 19 Nov 2026   Prob (F-statistic):           1.79e-29
-Time:                        15:50:07   Log-Likelihood:                -593.86
+Time:                        15:58:17   Log-Likelihood:                -593.86
 No. Observations:                  94   AIC:                             1192.
 Df Residuals:                      92   BIC:                             1197.
 Df Model:                           1                                         
@@ -2631,7 +2631,7 @@ Dep. Variable:         ecv_median_cm3   R-squared:                       0.809
 Model:                            OLS   Adj. R-squared:                  0.800
 Method:                 Least Squares   F-statistic:                     94.05
 Date:                Thu, 19 Nov 2026   Prob (F-statistic):           4.03e-31
-Time:                        15:50:07   Log-Likelihood:                -581.36
+Time:                        15:58:17   Log-Likelihood:                -581.36
 No. Observations:                  94   AIC:                             1173.
 Df Residuals:                      89   BIC:                             1185.
 Df Model:                           4                                         
@@ -2678,7 +2678,7 @@ Notes:
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>diag_plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div id="fig-residuals" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-residuals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2711,7 +2711,7 @@ Dep. Variable:         ecv_median_cm3   R-squared:                       0.841
 Model:                            OLS   Adj. R-squared:                  0.828
 Method:                 Least Squares   F-statistic:                     65.12
 Date:                Thu, 19 Nov 2026   Prob (F-statistic):           1.12e-31
-Time:                        15:50:07   Log-Likelihood:                -572.59
+Time:                        15:58:17   Log-Likelihood:                -572.59
 No. Observations:                  94   AIC:                             1161.
 Df Residuals:                      86   BIC:                             1182.
 Df Model:                           7                                         
@@ -2740,7 +2740,7 @@ Notes:
 </div>
 <p><strong>Question 3.4: What does the interaction term age_mid_Ma:C(grade)[T.pre.mod] test? Is it statistically significant? Does adding the interaction improve R-squared?</strong></p>
 <ul>
-<li>The interaction term tests whether the slope of ECV on age is different for pre-mod than for archaic hominins. ECV changed through time at a different rate in pre.mod specimens. The null hypothesis is that the two grades share the same slope. The interaction term is statistically significant: the coefficient is −245.0 cm3. Adding it to the archaic slope (−43.5 cm3) gives a pre.mod slope of −288.5 cm3. The mega and trans interaction terms are not significant (p = 0.81 and p = 0.46). Adding the interaction terms increased R-squared from 0.809 (model2) to 0.841 (model3). Adjusted R-squared also increased (0.800 → 0.828).</li>
+<li>The interaction term tests whether the slope of ECV on age is different for pre-mod than for archaic hominins. ECV changed through time at a different rate in pre.mod specimens. The null hypothesis is that the two grades share the same slope. The interaction term is statistically significant: the coefficient is −245.0 cm3. Adding it to the archaic slope (−43.5 cm3) gives a pre.mod slope of −288.5 cm3. The mega and trans interaction terms are not significant (p = 0.81 and p = 0.46). Adding the interaction terms increased R-squared from 0.809 (model2) to 0.841 (model3). Adjusted R-squared also increased (0.800 -&gt; 0.828).</li>
 </ul>
 </section>
 </section>
@@ -2773,7 +2773,7 @@ Notes:
 <span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>polished_fig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="23">
+<div class="cell-output cell-output-display" data-execution_count="11">
 <div id="fig-ecv-fitted" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-ecv-fitted-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2789,7 +2789,7 @@ Figure 2: Observed ECV and OLS fitted line (ECV ~ age). Points colored by grade
 <p>As shown in <a href="#fig-ecv-fitted" class="quarto-xref">Figure 2</a>, ECV increases toward the present, though considerable variation is present across grades.</p>
 <p><strong>Question 4.1: Render the document and confirm that <a href="#fig-ecv-fitted" class="quarto-xref">Figure 2</a> resolves to “Figure 1” (or the appropriate number) in the HTML output. If the reference does not resolve, what does Quarto show instead, and what does that tell you about the label?</strong></p>
 <ul>
-<li>The cross-reference resolves in the rendered html. <code>@fig-ecv-fitted</code> appears as “Figure 2” because the residual plot (<code>@fig-residuals</code>) is the first labeled figure. If the reference did not resolve, Quarto would show the raw label in bold with a question mark and print a warning. Meaning Quarto could not find a figure with that label or the chunk did not produce a figure.</li>
+<li>The reference resolves in the rendered html. If the reference did not resolve, Quarto would show the raw label in bold with a warning. The html would have down arrow and “Code”. Meaning Quarto could not find a figure with that label or the chunk did not produce a figure.</li>
 </ul>
 </section>
 <section id="inline-python-results" class="level3">
@@ -2818,7 +2818,7 @@ Figure 2: Observed ECV and OLS fitted line (ECV ~ age). Points colored by grade
 Table 1: Comparison of three OLS models for ECV
 </figcaption>
 <div aria-describedby="tbl-model-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output cell-output-display" data-execution_count="24">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 
 

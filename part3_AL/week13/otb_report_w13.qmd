@@ -160,7 +160,7 @@ print(model3.summary())
 
 **Question 3.4: What does the interaction term age_mid_Ma:C(grade)[T.pre.mod] test? Is it statistically significant? Does adding the interaction improve R-squared?**
 
- - The interaction term tests whether the slope of ECV on age is different for pre-mod than for archaic hominins. ECV changed through time at a different rate in pre.mod specimens. The null hypothesis is that the two grades share the same slope. The interaction term is statistically significant: the coefficient is −245.0 cm3. Adding it to the archaic slope (−43.5 cm3) gives a pre.mod slope of −288.5 cm3. The mega and trans interaction terms are not significant (p = 0.81 and p = 0.46). Adding the interaction terms increased R-squared from 0.809 (model2) to 0.841 (model3). Adjusted R-squared also increased (0.800 → 0.828).
+ - The interaction term tests whether the slope of ECV on age is different for pre-mod than for archaic hominins. ECV changed through time at a different rate in pre.mod specimens. The null hypothesis is that the two grades share the same slope. The interaction term is statistically significant: the coefficient is −245.0 cm3. Adding it to the archaic slope (−43.5 cm3) gives a pre.mod slope of −288.5 cm3. The mega and trans interaction terms are not significant (p = 0.81 and p = 0.46). Adding the interaction terms increased R-squared from 0.809 (model2) to 0.841 (model3). Adjusted R-squared also increased (0.800 -> 0.828).
 
 ## Part 4: Figures and Inline Results in Quarto
 ### 4.1 A Polished Figure with a Cross-Reference

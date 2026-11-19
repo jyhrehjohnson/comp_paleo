@@ -6,13 +6,12 @@ format:
   html:
     toc: true
     code-fold: true
+    embed-resources: true
 execute:
-  echo: true
+  echo: true 
   warning: false
 ---
 # Week 13 - Statistical Modeling and Quarto
-
-## Import data
 
 ## Part 1: Setting Up Quarto
 ### 1.3 First Chunk: Load the Data
@@ -28,7 +27,7 @@ from plotnine import *
 
 ecv = pd.read_csv("~/Documents/UT/comp_paleo/part3_AL/week11/ecv_by_specimen.csv")
 
-# Put the grades in evolutionary order (otherwise they sort alphabetically)
+# Put the grades in evolutionary order (otherwise they will be sorted alphabetically)
 grade_order = ["archaic", "mega", "trans", "pre.mod"]
 ecv["grade"] = pd.Categorical(ecv["grade"], categories=grade_order, ordered=True)
 
@@ -38,7 +37,7 @@ ecv.head()
 ```
 
 ## Part 2: Patsy Deisgn Matrics
-### 2.1 Build Patsy Design Matrices
+### 2.1 Build a Simple Design Matrix
 ```{python}
 #| label: design-matrix-simple
 
@@ -51,12 +50,11 @@ print("\nDesign matrix (X):")
 print(X.head())
 print("\nX columns:", X.columns.tolist())
 ```
+**Question 2.1: What are the two columns in X? What is the value of the intercept column for every row, and why?**
 
-Question 2.1: What are the two columns in X? What is the value of the intercept column for every row, and why?
+   - X is a matrix rather than a series. The two columns are vectors of 1s and X values: Intercept and age_mid_Ma. Intercept is fitting a linear model to estimate the slope and vertical offset. 
 
-   - X is a matrix rather than a series. The two columns are vectors of 1s and X values. Intercept is fitting a linear model to estimate the slope and vertical offset.
-
-### 2.2 Build a Multiple Deisgn Matrix
+### 2.2 Build a Multiple Design Matrix
 ```{python}
 #| label: design-matrix-multiple
 
@@ -67,11 +65,11 @@ print("X2 shape:", X2.shape)
 print("X2 columns:", X2.columns.tolist())
 print(X2.head(8))
 ```
-Question 2.2: How many columns does X2 have, and what does each one represent? Which grade is the reference level (the one that does NOT get its own dummy column)?
+**Question 2.2: How many columns does X2 have, and what does each one represent? Which grade is the reference level (the one that does NOT get its own dummy column)?**
 
- - X2 has 5 columns. Each column represents the Intercept, dummy variables: grade[T.meg], grade[T.trans], and grade[T.pre.mod] representing the different levels in my categorical variable, and the age_mid_Ma. Archaic is the reference level becasue we defined the caterogical order. 
+ - X2 has 5 columns. Each column represents the Intercept, dummy variables: C(grade)[T.mega], C(grade)[T.trans], and C(grade)[T.pre.mod] representing the different levels in my categorical variable, and the age_mid_Ma. Archaic is the reference level becasue we defined the caterogical order. 
 
- ### 2.3 Inspect the Encoding
+### 2.3 Inspect the Encoding
 ```{python}
 #| label: inspect-encoding
 
@@ -113,10 +111,9 @@ ecv["resid"] = model.resid
 model1 = smf.ols("ecv_median_cm3 ~ age_mid_Ma", data=ecv).fit()
 print(model1.summary())
 ```
+**Question 3.1: Report the slope, its p-value, and the R-squared. Is ECV significantly associated with age in this model? What does the sign of the slope tell you biologically?**
 
-Question 3.1 Report the slope, its p-value, and the R-squared. Is ECV significantly associated with age in this model? What does the sign of the slope tell you biologically?
-
- - Slope = -249.14, p-value < 0.0001, R-squared: 0.750 or 75% of the variance. Yes, ECV is significantly associated with age. Biologically, this reflects the overall trend of increased brain size in the hominin lineage, from small-brained early hominins to the larger brains of later Homo.
+ - Slope is -249.14, p-value < 0.0001, R-squared: 0.750 or 75% of the variance. Yes, ECV is significantly associated with age. Biologically, this reflects the overall trend of increased brain size from smaller brained early hominins (~400cc) to the larger brains of later Homo (~1400cc). The negative sign means older specimens have smaller ECVs.
 
 ### 3.2 Multiple Regression: ECV ~age + grade
 ```{python}
@@ -125,34 +122,33 @@ Question 3.1 Report the slope, its p-value, and the R-squared. Is ECV significan
 model2 = smf.ols("ecv_median_cm3 ~ age_mid_Ma + C(grade)", data=ecv).fit()
 print(model2.summary())
 ```
+**Question 3.2: Compare R-squared between model1 and model2. Does adding grade improve fit? Interpret the C(grade)[T.pre.mod] coefficient what do its sign and size tell you about pre.mod specimens compared with archaic specimens of the same age?**
 
-Question 3.2: Compare R-squared between model1 and model2. Does adding grade improve fit? Interpret the C(grade)[T.pre.mod] coefficient what do its sign and size tell you about pre.mod specimens compared with archaic specimens of the same age?
+ - Adding grade did improve the fit as the R-squared increased from 75% to 80%. As more parameters are introduced, the fit will improve. Adjusted R-squared also rose (0.748 → 0.800). Adding grade also reduced the age slope from −294 to −226. Meaning part of the age effect in model1 reflected which grades are present at different times. The coefficient of C(grade)[T.pre.mod] is 113.1 cm3. Because archaic is the reference grade, this is the difference in predicted ECV between a pre.mod specimen and an archaic specimen of the same age. The sign is positive and the size is about 113 cm3. 
 
- - Adding grade did improve the fit as the R-squared increased from 75% to 80%. As more parameters are introduced, the fit will improve. Adding grade also reduced the age slope from −294 to −226 cm3/Ma, meaning part of the age effect in model1 reflected which grades are present at different times. The coefficient of C(grade)[T.pre.mod] is 113.1 cm3. Because archaic is the reference grade and age is in the model, this is the difference in predicted ECV between a pre.mod specimen and an archaic specimen of the same age. The sign is positive and the size is about 113 cm3. 
-
- ### 3.3 Residual diagnostic plot
- ```{python}
- #| label: fig-residuals
+### 3.3 Residual Diagnostic Plot
+```{python}
+#| label: fig-residuals
 #| fig-cap: "Residuals vs. Fitted Values for the Multiple Regression Model"
 #| fig-width: 6
 #| fig-height: 4
 
 ecv_diag = ecv.copy()
-ecv_diag['fitted'] = model2.fittedvalues
-ecv_diag['resid'] = model2.resid
+ecv_diag["fitted"] = model2.fittedvalues
+ecv_diag["resid"] = model2.resid
 
-(
-    ggplot(ecv_diag, aes(x='fitted', y='resid'))
+diag_plot = (
+    ggplot(ecv_diag, aes(x="fitted", y="resid"))
     + geom_point(alpha=0.5)
-    + geom_hline(yintercept=0, color='red', linetype='dashed')
-    + labs(x='Fitted values', y='Residuals',
-           title='Residuals vs. Fitted')
+    + geom_hline(yintercept=0, color="red", linetype="dashed")
+    + labs(x="Fitted values", y="Residuals", title="Residuals vs. Fitted")
     + theme_bw()
 )
+diag_plot
 ```
+**Question 3.3: Describe the pattern (or lack of pattern) in the residual plot. Are there any obvious outliers or trends that suggest the OLS assumptions are violated?**
 
-Question 3.3: Describe the pattern (or lack of pattern) in the residual plot. Are there any obvious outliers or trends that suggest the OLS assumptions are violated?
- - Residuals are not great. U-shaped 
+ - The residuals are centered on zero and the scatter isn't random. ECV was somewhat stable in early hominins and increased in later Homo. The residual variance increases with ECV.
 
 ### 3.4 Interaction Term
 ```{python}
@@ -162,11 +158,12 @@ model3 = smf.ols("ecv_median_cm3 ~ age_mid_Ma * C(grade)", data=ecv).fit()
 print(model3.summary())
 ```
 
-Question 3.4: What does the interaction term age_mid_Ma:C(grade)[T.pre.mod] test? Is it statistically significant? Does adding the interaction improve R-squared?
- - 
+**Question 3.4: What does the interaction term age_mid_Ma:C(grade)[T.pre.mod] test? Is it statistically significant? Does adding the interaction improve R-squared?**
+
+ - The interaction term tests whether the slope of ECV on age is different for pre-mod than for archaic hominins. ECV changed through time at a different rate in pre.mod specimens. The null hypothesis is that the two grades share the same slope. The interaction term is statistically significant: the coefficient is −245.0 cm3. Adding it to the archaic slope (−43.5 cm3) gives a pre.mod slope of −288.5 cm3. The mega and trans interaction terms are not significant (p = 0.81 and p = 0.46). Adding the interaction terms increased R-squared from 0.809 (model2) to 0.841 (model3). Adjusted R-squared also increased (0.800 → 0.828).
 
 ## Part 4: Figures and Inline Results in Quarto
-### 4.1 A polished figure with a cross-reference
+### 4.1 A Polished Figure with a Cross-Reference
 ```{python}
 #| label: fig-ecv-fitted
 #| fig-cap: "Observed ECV and OLS fitted line (ECV ~ age). Points colored by grade."
@@ -178,10 +175,8 @@ pred = pd.DataFrame(
 )
 pred["ecv_pred"] = model1.predict(pred)
 
-(
-    ggplot(
-        ecv, aes(x="age_mid_Ma", y="ecv_median_cm3", color="grade", size="n_estimates")
-    )
+polished_fig = (
+    ggplot(ecv, aes(x="age_mid_Ma", y="ecv_median_cm3", color="grade"))
     + geom_point(alpha=0.6, size=2)
     + geom_line(
         aes(x="age_mid_Ma", y="ecv_pred"),
@@ -190,20 +185,24 @@ pred["ecv_pred"] = model1.predict(pred)
         size=1,
         inherit_aes=False,
     )
+    + geom_smooth(method="lm", color="blue", linetype="dashed")
     + scale_x_reverse()
     + labs(x="Age (Ma)", y="ECV (cm³)", color="Grade", title="Hominin ECV Through Time")
     + theme_bw()
 )
+polished_fig
 ```
 
 As shown in @fig-ecv-fitted, ECV increases toward the present, though considerable variation is present across grades.
 
-Question 4.1: Render the document and confirm that @fig-ecv-fitted resolves to "Figure 1" (or the appropriate number) in the HTML output. If the reference does not resolve, what does Quarto show instead, and what does that tell you about the label?
- - 
+**Question 4.1: Render the document and confirm that @fig-ecv-fitted resolves to "Figure 1" (or the appropriate number) in the HTML output. If the reference does not resolve, what does Quarto show instead, and what does that tell you about the label?**
 
- ### 4.2 Inline Python Results
+ - The cross-reference resolves in the rendered html. `@fig-ecv-fitted` appears as "Figure 2" because the residual plot (`@fig-residuals`) is the first labeled figure. If the reference did not resolve, Quarto would show the raw label in bold with a question mark and print a warning. Meaning Quarto could not find a figure with that label or the chunk did not produce a figure.
 
-The simple regression explains `{python} round(model1.rsquared, 3)` of the variance in ECV. For every additional million years into the past, ECV decreases by `{python} abs(round(model1.params['age_mid_Ma'], 1))` cc on average (p = `{python} round(model1.pvalues['age_mid_Ma'], 4)`).
+ 
+### 4.2 Inline Python Results
+
+The simple regression explains `{python} float(round(model1.rsquared, 3))` of the variance in ECV. For every additional million years into the past, ECV decreases by `{python} float(abs(round(model1.params['age_mid_Ma'], 1)))` cc on average (p = `{python} f"{model1.pvalues['age_mid_Ma']:.2g}"`).
 
 ### 4.3 A Model Comparison Table
 ```{python}
@@ -222,6 +221,6 @@ comparison = pd.DataFrame(
 comparison
 ```
 
-Question 4.2: Based on this table, which model fits best according to adjusted R-squared? Which fits best according to AIC (lower is better)? Do the two criteria agree?
+**Question 4.2: Based on this table, which model fits best according to adjusted R-squared? Which fits best according to AIC (lower is better)? Do the two criteria agree?**
 
-Deliverable: A rendered HTML report with a cross-referenced figure, inline statistics, and a model comparison table, plus written answers to Questions 4.1 and 4.2.
+ - The ECV ~ age * C(grade) model fits best. It has the highest Adjusted R-squard (0.828 [model2], 0.800 [model1], and 0.748 [model0]) and the lowest AIC (1161.2 [model2], 1172.7 [model1], and 1191.7 [model0]). The two criteria agree. 
